@@ -1,0 +1,65 @@
+<div class="create-brand-wrapper">
+  <!-- Tiêu đề -->
+  <h2>Create Brand</h2>
+
+  <!-- Box tổng (bo góc) -->
+  <div class="brand-box">
+    
+    <!-- Sidebar: Brand Information được bọc box riêng -->
+    <div class="brand-sidebar-box">
+        <h3 class="sidebar-header">Brand Information</h3>
+        <ul>
+            <li [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">General</li>
+            <li [class.active]="activeTab === 'images'" (click)="activeTab = 'images'">Images</li>
+        </ul>
+    </div>
+
+    <!-- Nội dung bên phải -->
+    <div class="brand-content">
+      <div *ngIf="activeTab === 'general'">
+        <h3>General</h3>
+        <hr />
+        <!-- Form -->
+        <form [formGroup]="brandForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label>Name <span class="required">*</span></label>
+            <input formControlName="name" type="text" />
+          </div>
+
+          <div class="form-group">
+            <label><input type="checkbox" formControlName="status" /> Enable the brand</label>
+          </div>
+
+          <button type="submit" class="btn-save">Save</button>
+        </form>
+      </div>
+
+      <!-- Tabs khác -->
+      <div *ngIf="activeTab === 'images'">
+            <h3>Images</h3>
+            <hr />
+
+            <div class="image-block">
+                <label>Logo</label>
+                <button type="button" class="btn-browse" (click)="handleBrowse()">
+                  <i class="fas fa-folder-open"></i> Browse
+                </button>
+                <div class="image-preview">
+                <i class="fas fa-image"></i>
+                </div>
+            </div>
+
+            <div class="image-block">
+                <label>Banner</label>
+                <button type="button" class="btn-browse" (click)="handleBrowse()">
+                  <i class="fas fa-folder-open"></i> Browse
+                </button>
+                <div class="image-preview">
+                <i class="fas fa-image"></i>
+                </div>
+            </div>
+
+            <button type="button" class="btn-save">Save</button>
+            </div>
+  </div>
+</div>

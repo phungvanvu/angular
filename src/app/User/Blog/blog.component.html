@@ -1,0 +1,241 @@
+<div class="blog-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <!-- Desktop Header -->
+      <div class="desktop-header" [class.hidden]="isMobile">
+        <div class="header-left">
+          <div class="logo">
+            TechShop
+          </div>
+          <nav class="nav">
+            <a href="#" class="nav-link">Home</a>
+            <a href="#" class="nav-link active">Shop</a>
+            <a href="#" class="nav-link">Categories</a>
+            <a href="#" class="nav-link">Deals</a>
+          </nav>
+        </div>
+        <div class="header-right">
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search products..."
+              class="search-input"
+              [(ngModel)]="productSearchQuery"
+              (keyup.enter)="searchProducts(productSearchQuery)">
+            <mat-icon class="search-icon" (click)="searchProducts(productSearchQuery)">search</mat-icon>
+          </div>
+          <div class="header-actions">
+            <button class="icon-btn" (click)="toggleWishlist()">
+              <mat-icon class="icon">favorite</mat-icon>
+            </button>
+            <button class="icon-btn cart-btn" (click)="openCart()">
+              <mat-icon class="icon">shopping_cart</mat-icon>
+              <span class="badge" *ngIf="cartCount > 0">{{cartCount}}</span>
+            </button>
+            <button class="icon-btn" (click)="openProfile()">
+              <mat-icon class="icon">person</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Header -->
+      <div class="mobile-header" [class.hidden]="!isMobile">
+        <div class="mobile-header-main">
+          <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+            <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+          </button>
+
+          <div class="logo">
+            TechShop
+          </div>
+
+          <div class="mobile-header-actions">
+            <button class="icon-btn mobile-search-btn" (click)="toggleMobileSearch()">
+              <mat-icon class="icon">search</mat-icon>
+            </button>
+            <button class="icon-btn cart-btn" (click)="openCart()">
+              <mat-icon class="icon">shopping_cart</mat-icon>
+              <span class="badge" *ngIf="cartCount > 0">{{cartCount}}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="mobile-search-bar" [class.active]="isMobileSearchOpen">
+          <div class="mobile-search-container">
+            <input
+              type="text"
+              placeholder="Search products..."
+              class="mobile-search-input"
+              [(ngModel)]="productSearchQuery"
+              (keyup.enter)="searchProducts(productSearchQuery)">
+            <button class="mobile-search-submit" (click)="searchProducts(productSearchQuery)">
+              <mat-icon>search</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div class="mobile-menu" [class.active]="isMobileMenuOpen">
+          <nav class="mobile-nav">
+            <a href="#" class="mobile-nav-link" (click)="closeMobileMenu()">
+              <mat-icon>home</mat-icon>
+              Home
+            </a>
+            <a href="#" class="mobile-nav-link active" (click)="closeMobileMenu()">
+              <mat-icon>store</mat-icon>
+              Shop
+            </a>
+            <a href="#" class="mobile-nav-link" (click)="closeMobileMenu()">
+              <mat-icon>category</mat-icon>
+              Categories
+            </a>
+            <a href="#" class="mobile-nav-link" (click)="closeMobileMenu()">
+              <mat-icon>local_offer</mat-icon>
+              Deals
+            </a>
+          </nav>
+
+          <div class="mobile-menu-actions">
+            <button class="mobile-action-btn" (click)="toggleWishlist(); closeMobileMenu()">
+              <mat-icon>favorite</mat-icon>
+              Wishlist
+            </button>
+            <button class="mobile-action-btn" (click)="openProfile(); closeMobileMenu()">
+              <mat-icon>person</mat-icon>
+              Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="content-wrapper">
+      <!-- Blog Posts Grid -->
+      <div class="blog-grid">
+        <!-- Blog Header với Search -->
+        <div class="blog-header">
+          <h1 class="page-title">Blog</h1>
+          <div class="blog-search-widget">
+            <div class="blog-search-box">
+              <input
+                type="text"
+                placeholder="Search blog posts..."
+                class="blog-search-input"
+                [(ngModel)]="blogSearchQuery"
+                (keyup.enter)="searchBlog(blogSearchQuery)">
+              <button class="blog-search-btn" (click)="searchBlog(blogSearchQuery)">
+                <mat-icon class="search-icon-btn">search</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Posts Grid -->
+        <div class="posts-grid">
+          <article class="blog-post" *ngFor="let post of displayedPosts; trackBy: trackByPostId">
+            <div class="post-image">
+              <img [src]="post.image" [alt]="post.title" loading="lazy" />
+            </div>
+            <div class="post-content">
+              <div class="post-meta">
+                <span class="post-category">{{ post.category }}</span>
+                <span class="post-date">{{ post.date | date:'dd MMM, yyyy' }}</span>
+              </div>
+              <h3 class="post-title">{{ post.title }}</h3>
+              <p class="post-excerpt">{{ post.excerpt }}</p>
+              <a href="#" class="read-more" (click)="readPost(post.id)">
+                Read Post
+                <mat-icon>arrow_forward</mat-icon>
+              </a>
+            </div>
+          </article>
+        </div>
+
+        <!-- No Posts Message -->
+        <div *ngIf="displayedPosts.length === 0" class="no-posts">
+          <mat-icon class="no-posts-icon">article</mat-icon>
+          <p>No blog posts found. Try adjusting your search or filters.</p>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div *ngIf="isLoading" class="loading">
+          <mat-icon class="loading-icon">refresh</mat-icon>
+          <p>Loading posts...</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button
+            class="page-btn"
+            [disabled]="currentPage === 1"
+            (click)="goToPage(currentPage - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          <button
+            *ngFor="let page of getPageNumbers()"
+            class="page-btn"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+
+          <span class="page-dots" *ngIf="totalPages > 5">...</span>
+
+          <button
+            class="page-btn"
+            [disabled]="currentPage === totalPages"
+            (click)="goToPage(currentPage + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Categories Widget -->
+        <div class="widget">
+          <h3 class="widget-title">
+            Categories
+          </h3>
+          <div class="widget-content">
+            <ul class="category-list">
+              <li *ngFor="let category of categories">
+                <a href="#" class="category-link" (click)="filterByBlogCategory(category.name); $event.preventDefault()">
+                  {{ category.name }}
+                  <span class="category-count">{{ category.count }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Recent Posts Widget -->
+        <div class="widget">
+          <h3 class="widget-title">
+            Recent Posts
+          </h3>
+          <div class="widget-content">
+            <div class="recent-post" *ngFor="let post of recentPosts; trackBy: trackByRecentPostTitle">
+              <div class="recent-post-image">
+                <img [src]="post.image" [alt]="post.title" loading="lazy" />
+              </div>
+              <div class="recent-post-content">
+                <h4 class="recent-post-title" (click)="readRecentPost(post.title)">{{ post.title }}</h4>
+                <span class="recent-post-date">
+                  {{ post.date | date:'dd MMM, yyyy' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>

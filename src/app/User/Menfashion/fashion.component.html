@@ -1,0 +1,222 @@
+<div class="shop-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">TechShop</div>
+        <nav class="nav">
+          <a href="#" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Shop</a>
+          <a href="#" class="nav-link">Categories</a>
+          <a href="#" class="nav-link">Deals</a>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <div class="search-box">
+          <input type="text" placeholder="Search products..." class="search-input">
+          <span class="material-icons search-icon">search</span>
+        </div>
+        <button class="icon-btn">
+          <span class="material-icons icon">favorite_border</span>
+          <span class="cart-badge" *ngIf="wishlistCount > 0">{{ wishlistCount }}</span>
+        </button>
+        <button class="icon-btn cart-btn">
+          <span class="material-icons icon">shopping_cart</span>
+          <span class="cart-badge">{{ cartItems }}</span>
+        </button>
+        <button class="icon-btn">
+          <span class="material-icons icon">person</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Browse Categories</h3>
+
+        <div class="categories-list">
+          <div *ngFor="let category of categories" class="category-item">
+            <button
+              (click)="toggleCategory(category.id)"
+              class="category-btn"
+              [class.expanded]="category.expanded">
+              <div class="category-info">
+                <span class="category-icon">{{ category.icon }}</span>
+                <span class="category-name">{{ category.name }}</span>
+              </div>
+              <span class="material-icons expand-icon" [class.rotated]="category.expanded">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="sidebar-section">
+        <h4 class="filter-title">
+          <span class="material-icons filter-icon">tune</span>
+          Filters
+        </h4>
+
+        <!-- Price Range -->
+        <div class="filter-group">
+          <h5 class="filter-label">Price</h5>
+          <div class="price-inputs">
+            <input
+              type="number"
+              [(ngModel)]="priceRange[0]"
+              class="price-input"
+              min="0">
+            <span class="price-separator">-</span>
+            <input
+              type="number"
+              [(ngModel)]="priceRange[1]"
+              class="price-input"
+              min="0">
+          </div>
+          <input
+            type="range"
+            min="2"
+            max="7499"
+            [value]="priceRange[1]"
+            (input)="onPriceRangeChange($event)"
+            class="price-range">
+        </div>
+
+        <!-- Latest Products -->
+        <div class="filter-group">
+          <h5 class="filter-label">Latest Products</h5>
+          <div class="latest-products">
+            <div *ngFor="let product of latestProducts" class="latest-product">
+              <div class="latest-product-image">
+                <span class="material-icons">headphones</span>
+              </div>
+              <div class="latest-product-info">
+                <p class="latest-product-name">{{ product.name }}</p>
+                <div class="latest-product-price">
+                  <span class="current-price">${{ product.price }}</span>
+                  <span *ngIf="product.originalPrice" class="original-price">${{ product.originalPrice }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="banner">
+        <img src="assets/images/bannerFashion.png" alt="Men's Fashion Banner" class="banner-image">
+      </div>
+      <div class="content-header">
+        <h1 class="page-title">Men's Fashion</h1>
+
+        <div class="content-controls">
+          <div class="view-controls">
+            <button
+              (click)="setViewMode('grid')"
+              class="view-btn"
+              [class.active]="viewMode === 'grid'">
+              <span class="material-icons view-icon">grid_view</span>
+            </button>
+            <button
+              (click)="setViewMode('list')"
+              class="view-btn"
+              [class.active]="viewMode === 'list'">
+              <span class="material-icons view-icon">list</span>
+            </button>
+          </div>
+
+          <div class="sort-controls">
+            <select
+              [value]="sortBy"
+              (change)="onSortChange($event)"
+              class="sort-select">
+              <option *ngFor="let option of sortOptions" [value]="option">
+                {{ option }}
+              </option>
+            </select>
+
+            <select
+              [value]="itemsPerPage"
+              (change)="onItemsPerPageChange($event)"
+              class="items-select">
+              <option *ngFor="let option of itemsPerPageOptions" [value]="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" [class.list-view]="viewMode === 'list'">
+        <div *ngFor="let product of filteredProducts" class="product-card">
+          <div class="product-image-container">
+            <img [src]="product.image" [alt]="product.name" class="product-image">
+            <div *ngIf="product.badge"
+                 class="product-badge"
+                 [ngClass]="'badge-' + product.badgeColor">
+              {{ product.badge }}
+            </div>
+            <div class="product-overlay">
+              <button
+                (click)="addToWishlist(product)"
+                class="overlay-btn wishlist-btn"
+                [ngClass]="{ active: product.isWishlisted }">
+                <span class="material-icons">
+                  {{ product.isWishlisted ? 'favorite' : 'favorite_border' }}
+                </span>
+              </button>
+              <button
+                (click)="addToCart(product)"
+                class="overlay-btn cart-btn">
+                <span class="material-icons">shopping_cart</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+
+            <div class="product-rating">
+              <div class="stars">
+                <span *ngFor="let star of generateStars(product.rating)"
+                      class="material-icons star"
+                      [class.filled]="star">star</span>
+              </div>
+              <span class="reviews-count">{{ product.reviews }} Review{{ product.reviews !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="product-pricing">
+              <span class="current-price">${{ product.price.toFixed(2) }}</span>
+              <span *ngIf="product.originalPrice" class="original-price">
+                ${{ product.originalPrice.toFixed(2) }}
+              </span>
+            </div>
+
+            <button
+              (click)="addToCart(product)"
+              class="add-to-cart-btn"
+              [disabled]="product.badge === 'Out of Stock'">
+              {{ product.badge === 'Out of Stock' ? 'Out of Stock' : 'Add to Cart' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button class="page-btn" disabled>Previous</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">Next</button>
+      </div>
+    </main>
+  </div>
+</div>

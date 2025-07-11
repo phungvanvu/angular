@@ -1,0 +1,161 @@
+.variation-wrapper {
+  padding: 30px 40px;
+}
+
+h2 {
+  margin-bottom: 30px;
+}
+
+.content-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 50px 150px 50px 50px;
+}
+
+.form-row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.form-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 100px; 
+  width: 250px;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.form-content {
+ width: 70%;
+}
+
+.general-fields {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 7px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.values-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.values-table th,
+.values-table td {
+  border: 1px solid #eee;
+  padding: 8px;
+}
+
+.values-table th {
+  text-align: left;
+  font-weight: 600;
+}
+
+.drag-icon {
+  text-align: center;
+  width: 40px;
+}
+
+.values-table input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.color-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.color-group input[type="text"] {
+  flex: 1;
+  border: none;
+  padding: 8px 12px;
+}
+
+.color-group input[type="color"] {
+  border: none;
+  width: 38px;
+  height: 38px;
+  padding: 2px;
+  cursor: pointer;
+  border-left: 1px solid #ccc;
+}
+
+.color-group input:focus {
+  outline: none;
+}
+
+.btn-delete {
+  background: #eee;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete i {
+  color: #333;
+}
+
+.btn-add-row {
+  margin-top: 12px;
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-save {
+  background-color: rgb(85, 141, 214);
+  border-radius: 8px;
+  border: 1px solid #d3cfcf;
+  padding: 5px 10px;
+  color: #fff;
+}
+
+.required {
+  color: red;
+}
+.values-table td:nth-child(2) {
+  width: 70%; 
+}
+
+.values-table td:nth-child(3) {
+  width: 40%; 
+}

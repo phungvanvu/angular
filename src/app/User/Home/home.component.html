@@ -1,0 +1,448 @@
+<!-- ============================ -->
+<!-- Container chính của ứng dụng FleetCart -->
+<!-- ============================ -->
+<div class="fleetcart-container">
+
+    <!-- ============================ -->
+    <!-- Header top - thanh thông tin trên cùng -->
+    <!-- ============================ -->
+    <!-- Top Navigation Header Component -->
+    <div class="top-nav">
+        <div class="container">
+            <div class="top-nav">
+                <div class="d-flex justify-content-between">
+
+                    <!-- Left side welcome message - hidden on mobile -->
+                    <div class="top-nav-left d-none d-lg-block">
+                        <span style="padding: 10px;">Welcome to FleetCart store</span>
+                    </div>
+                    <!-- Right side navigation items -->
+                    <div class="top-nav-right">
+                        <ul class="list-inline top-nav-right-list">
+
+                            <!-- Contact Link -->
+                            <li>
+                                <a href="/contact" class="nav-link">
+                                    <mat-icon class="nav-icon">email</mat-icon>
+                                    Contact
+                                </a>
+                            </li>
+
+                            <!-- Language Dropdown -->
+                            <li class="dropdown custom-dropdown" [class.active]="isLanguageOpen"
+                                (clickOutside)="closeLanguageDropdown()">
+                                <div class="btn btn-secondary dropdown-toggle" [class.active]="isLanguageOpen"
+                                    (click)="toggleLanguageDropdown()">
+                                    <mat-icon class="nav-icon">language</mat-icon>
+                                    {{ selectedLanguage }}
+                                    <mat-icon class="dropdown-arrow">keyboard_arrow_down</mat-icon>
+                                </div>
+
+                                <!-- Language dropdown menu -->
+                                <ul *ngIf="isLanguageOpen" class="dropdown-menu" [class.active]="isLanguageOpen">
+                                    <div class="dropdown-menu-scroll">
+                                        <li *ngFor="let language of languages" class="dropdown-item"
+                                            (click)="selectLanguage(language)">
+                                            {{ language.name }}
+                                        </li>
+                                    </div>
+                                </ul>
+                            </li>
+
+                            <!-- Currency Dropdown -->
+                            <li class="dropdown custom-dropdown" [class.active]="isCurrencyOpen"
+                                (clickOutside)="closeCurrencyDropdown()">
+                                <div class="btn btn-secondary dropdown-toggle" [class.active]="isCurrencyOpen"
+                                    (click)="toggleCurrencyDropdown()">
+                                    <mat-icon class="nav-icon">attach_money</mat-icon>
+                                    {{ selectedCurrency }}
+                                    <mat-icon class="dropdown-arrow">keyboard_arrow_down</mat-icon>
+                                </div>
+
+                                <!-- Currency dropdown menu -->
+                                <ul *ngIf="isCurrencyOpen" class="dropdown-menu" [class.active]="isCurrencyOpen">
+                                    <div class="dropdown-menu-scroll">
+                                        <li *ngFor="let currency of currencies" class="dropdown-item"
+                                            (click)="selectCurrency(currency)">
+                                            {{ currency.code }}
+                                        </li>
+                                    </div>
+                                </ul>
+                            </li>
+
+                            <!-- Login/Register Link -->
+                            <li>
+                                <a href="/login" class="nav-link">
+                                    <mat-icon class="nav-icon">login</mat-icon>
+                                    Login / Register
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================ -->
+        <!-- Main header - Logo, Tìm kiếm, Giỏ hàng -->
+        <!-- ============================ -->
+        <header class="main-header">
+            <div class="container">
+                <div class="header-content">
+                    <!-- Logo -->
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <mat-icon>shopping_cart</mat-icon>
+                        </div>
+                        <span class="logo-text">FleetCart</span>
+                    </div>
+
+                    <!-- Search bar -->
+                    <div class="search-section">
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for products" class="search-input"
+                                (input)="onSearch($event)">
+                            <select class="category-dropdown">
+                                <option value="">All Categories</option>
+                                <option *ngFor="let category of categories" [value]="category.id">
+                                    {{ category.name }}
+                                </option>
+                            </select>
+                            <button class="search-btn">
+                                <mat-icon>search</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Header actions -->
+                    <div class="header-actions">
+                        <button class="action-btn wishlist-btn">
+                            <mat-icon>favorite_border</mat-icon>
+                            <span class="badge">0</span>
+                        </button>
+                        <button class="action-btn compare-btn">
+                            <mat-icon>compare_arrows</mat-icon>
+                            <span class="badge">0</span>
+                        </button>
+                        <button class="action-btn cart-btn">
+                            <mat-icon>shopping_cart</mat-icon>
+                            <span class="badge">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Mobile menu toggle -->
+                    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+                        <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================ -->
+        <!-- Navigation - thanh điều hướng và danh mục -->
+        <!-- ============================ -->
+        <nav class="main-nav" [class.mobile-open]="isMobileMenuOpen">
+            <div class="container">
+                <div class="nav-content">
+                    <!-- Categories dropdown -->
+                    <div class="categories-dropdown">
+                        <button class="categories-btn">
+                            <mat-icon>menu</mat-icon>
+                            ALL CATEGORIES
+                        </button>
+                        <!-- Menu danh mục -->
+                        <div class="categories-menu">
+                            <div *ngFor="let category of categories" class="category-item"
+                                (click)="onCategoryClick(category)">
+                                <mat-icon>{{ category.icon }}</mat-icon>
+                                <span>{{ category.name }}</span>
+                                <mat-icon *ngIf="category.hasSubcategories" class="arrow">
+                                    keyboard_arrow_right
+                                </mat-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main navigation links -->
+                    <div class="nav-links">
+                        <a href="#" class="nav-link">Shop</a>
+                        <a href="#" class="nav-link">Blog</a>
+                        <a href="#" class="nav-link">Buy Now!</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ============================ -->
+        <!-- Main content - Banner, Sidebar, Sản phẩm nổi bật -->
+        <!-- ============================ -->
+        <main class="main-content">
+            <div class="container">
+                <div class="content-grid">
+
+                    <!-- Left sidebar - Danh mục phụ -->
+                    <aside class="sidebar">
+                        <div class="sidebar-categories">
+                            <div *ngFor="let category of categories" class="sidebar-category"
+                                (click)="onCategoryClick(category)">
+                                <mat-icon>{{ category.icon }}</mat-icon>
+                                <span>{{ category.name }}</span>
+                                <mat-icon *ngIf="category.hasSubcategories" class="arrow">
+                                    keyboard_arrow_right
+                                </mat-icon>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Main area - Banner chính -->
+                    <div class="main-area">
+                        <section class="hero-banner">
+                            <div class="hero-content">
+                                <div class="hero-text">
+                                    <h1>{{ mainProduct.name }}</h1>
+                                    <p>{{ mainProduct.description }}</p>
+                                </div>
+                                <div class="hero-image">
+                                    <img [src]="mainProduct.image" [alt]="mainProduct.name">
+                                </div>
+                            </div>
+                            <!-- Carousel indicators -->
+                            <!-- Carousel indicators -->
+                            <div class="carousel-indicators">
+                                <button *ngFor="let product of featuredProducts; let i = index" class="indicator"
+                                    [class.active]="i === currentSlide" (click)="goToSlide(i)">
+                                </button>
+                            </div>
+
+                        </section>
+                    </div>
+
+                    <!-- Right sidebar - Sản phẩm nổi bật nhỏ -->
+                    <aside class="right-sidebar">
+                        <div class="featured-product" *ngFor="let product of featuredProducts">
+                            <div class="product-badge">{{ product.discount }}</div>
+                            <div class="product-content">
+                                <h3>{{ product.name }}</h3>
+                                <div class="product-actions">
+                                    <button class="shop-now-btn" (click)="onProductClick(product)">Shop Now</button>
+                                </div>
+                            </div>
+                            <div class="product-image">
+                                <img [src]="product.image" [alt]="product.name">
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </main>
+
+        <!-- ============================ -->
+        <!-- Section dịch vụ nổi bật bên dưới banner (gộp từ top-categories) -->
+        <!-- ============================ -->
+        <div class="service-features-section">
+            <div class="service-features-wrapper">
+                <div class="service-feature-item"
+                    *ngFor="let feature of serviceFeatures; trackBy: trackByServiceFeature">
+                    <div class="feature-icon-container">
+                        <mat-icon [style.color]="feature.color" class="feature-icon">{{ feature.icon }}</mat-icon>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">{{ feature.title }}</h3>
+                        <p class="feature-description">{{ feature.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================ -->
+        <!-- Section hiển thị danh mục top (từ Top Categories in Sales and Trending) -->
+        <!-- product-showcase.component.html -->
+        <div class="product-showcase-container">
+
+            <!-- Header Section - Tiêu đề và mô tả -->
+            <!-- Container chính cho component -->
+            <div class="top-categories-container">
+                <!-- Header section với tiêu đề và mô tả -->
+                <div class="header-section">
+                    <h2 class="main-title">Top Categories in Sales and Trending</h2>
+                    <p class="description">
+                        Last Month up to 1500+ Products Sales From this category. You can choose a
+                        product from here and save money.
+                    </p>
+                </div>
+
+
+            </div>
+
+
+
+            <!-- Products Grid - Lưới hiển thị sản phẩm -->
+            <!-- ... phần trên giữ nguyên ... -->
+
+            <!-- Products Grid - Lưới hiển thị sản phẩm -->
+
+            <!-- ============================ -->
+            <!-- Footer -->
+            <!-- ============================ -->
+            <!-- Footer Component Template -->
+            <footer class="footer">
+
+                <!-- Newsletter Section - Phần đăng ký nhận tin -->
+                <div class="newsletter-section">
+                    <div class="container">
+                        <div class="newsletter-content">
+                            <!-- Newsletter Title và Description -->
+                            <div class="newsletter-text">
+                                <h2 class="newsletter-title">Subscribe to Our Newsletter</h2>
+                                <p class="newsletter-description">Subscribe to our newsletter & get notification about
+                                    discounts.</p>
+                            </div>
+
+                            <!-- Newsletter Form -->
+                            <div class="newsletter-form">
+                                <div class="input-group">
+                                    <input type="email" [(ngModel)]="email" placeholder="Email address"
+                                        class="email-input" (keyup.enter)="onSubscribe()">
+                                    <button type="button" class="subscribe-btn" (click)="onSubscribe()">
+                                        Subscribe
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Footer Content - Nội dung chính của footer -->
+                <div class="footer-main">
+                    <div class="container">
+                        <div class="footer-grid">
+
+                            <!-- Contact Us Section -->
+                            <div class="footer-column">
+                                <h3 class="footer-title">Contact Us</h3>
+                                <div class="contact-info">
+                                    <!-- Phone -->
+                                    <div class="contact-item">
+                                        <mat-icon class="contact-icon">phone</mat-icon>
+                                        <span>{{ contactInfo.phone }}</span>
+                                    </div>
+                                    <!-- Email -->
+                                    <div class="contact-item">
+                                        <mat-icon class="contact-icon">email</mat-icon>
+                                        <span>{{ contactInfo.email }}</span>
+                                    </div>
+                                    <!-- Address -->
+                                    <div class="contact-item">
+                                        <mat-icon class="contact-icon">location_on</mat-icon>
+                                        <span>{{ contactInfo.address }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Social Media Links -->
+                                <div class="social-links">
+                                    <a href="{{ link.url }}" class="social-link" *ngFor="let link of socialLinks"
+                                        (click)="onSocialClick(link.name, link.url)">
+                                        <mat-icon>{{ link.icon }}</mat-icon>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- My Account Section -->
+                            <div class="footer-column">
+                                <h3 class="footer-title">My Account</h3>
+                                <ul class="footer-links">
+                                    <li *ngFor="let link of accountLinks">
+                                        <a href="{{ link.url }}" class="footer-link"
+                                            (click)="onLinkClick(link.name, link.url)">
+                                            {{ link.name }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Our Services Section -->
+                            <div class="footer-column">
+                                <h3 class="footer-title">Our Services</h3>
+                                <ul class="footer-links">
+                                    <li *ngFor="let link of serviceLinks">
+                                        <a href="{{ link.url }}" class="footer-link"
+                                            (click)="onLinkClick(link.name, link.url)">
+                                            {{ link.name }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Information Section -->
+                            <div class="footer-column">
+                                <h3 class="footer-title">Information</h3>
+                                <ul class="footer-links">
+                                    <li *ngFor="let link of informationLinks">
+                                        <a href="{{ link.url }}" class="footer-link"
+                                            (click)="onLinkClick(link.name, link.url)">
+                                            {{ link.name }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Tags Section -->
+                            <div class="footer-column">
+                                <h3 class="footer-title">Tags</h3>
+                                <div class="tags-container">
+                                    <button class="tag-item" *ngFor="let tag of tags" (click)="onTagClick(tag.name)">
+                                        <mat-icon class="tag-icon">{{ tag.icon }}</mat-icon>
+                                        <span>{{ tag.name }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Bottom - Phần cuối footer với copyright và payment methods -->
+                <div class="footer-bottom">
+                    <div class="container">
+                        <div class="footer-bottom-content">
+
+                            <!-- Buy Now Button (Left side) -->
+                            <div class="buy-now-section">
+                                <div class="buy-now-btn">
+                                    <span class="price">৳59</span>
+                                    <div class="buy-text">
+                                        <span class="buy">Buy</span>
+                                        <span class="now">Now</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Copyright (Center) -->
+                            <div class="copyright">
+                                <p>
+                                    Copyright ©
+                                    <a href="#" class="footer-link">FleetCart</a>
+                                    2025. All rights reserved.
+                                </p>
+                            </div>
+
+                            <!-- Payment Methods và Scroll to Top (Right side) -->
+                            <div class="footer-right">
+                                <!-- Payment Methods -->
+                                <div class="payment-methods">
+                                    <img *ngFor="let method of paymentMethods"
+                                        [src]="'assets/images/payment/' + method.toLowerCase() + '.png'" [alt]="method"
+                                        class="payment-icon">
+                                </div>
+
+                                <!-- Scroll to Top Button -->
+                                <button class="scroll-top-btn" (click)="scrollToTop()" aria-label="Scroll to top">
+                                    <mat-icon>keyboard_arrow_up</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+        </div>

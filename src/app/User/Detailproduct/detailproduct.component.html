@@ -1,0 +1,246 @@
+<div class="product-detail-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">TechShop</div>
+        <nav class="nav">
+          <a href="#" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Shop</a>
+          <a href="#" class="nav-link">Categories</a>
+          <a href="#" class="nav-link">Deals</a>
+        </nav>
+      </div>
+      <div class="header-right">
+        <div class="search-box">
+          <input type="text" placeholder="Search products..." class="search-input">
+          <span class="material-icons search-icon">search</span>
+        </div>
+        <button class="icon-btn">
+          <span class="material-icons icon">favorite_border</span>
+        </button>
+        <button class="icon-btn cart-btn">
+          <span class="material-icons icon">shopping_cart</span>
+          <!-- <span class="cart-badge">{{ cartItems }}</span> -->
+        </button>
+        <button class="icon-btn">
+          <span class="material-icons icon">person</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Product Detail Content -->
+  <div class="product-container">
+    <div class="product-content">
+      <!-- Product Images -->
+      <div class="product-images">
+        <div class="main-image">
+          <img [src]="product.images[selectedImage]" [alt]="product.name" />
+        </div>
+        <div class="thumbnail-images">
+          <div
+            *ngFor="let image of product.images; let i = index"
+            class="thumbnail"
+            [class.active]="selectedImage === i"
+            (click)="selectImage(i)">
+            <img [src]="image" [alt]="'Product image ' + (i + 1)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <!-- Rating -->
+        <div class="rating-section">
+          <div class="stars">
+            <span
+              *ngFor="let star of getStars(product.rating)"
+              class="star"
+              [class.filled]="star === 'star'">
+              ★
+            </span>
+          </div>
+          <span class="review-count">{{ product.reviews }} Reviews</span>
+        </div>
+
+        <!-- Stock Status -->
+        <div class="stock-status" *ngIf="product.inStock">
+          <span class="in-stock">In Stock</span>
+        </div>
+
+        <!-- Description -->
+        <div class="product-description">
+          <p>{{ product.description }}</p>
+          <p class="warranty">{{ product.warranty }}</p>
+        </div>
+
+        <!-- Price -->
+        <div class="price-section">
+          <span class="price">${{ product.price }}</span>
+        </div>
+
+        <!-- Quantity and Add to Cart -->
+        <div class="purchase-section">
+          <div class="quantity-selector">
+            <label>Quantity:</label>
+            <div class="quantity-controls">
+              <button (click)="changeQuantity(-1)" class="qty-btn">-</button>
+              <input type="number" [(ngModel)]="quantity" min="1" class="qty-input" />
+              <button (click)="changeQuantity(1)" class="qty-btn">+</button>
+            </div>
+          </div>
+          <button class="add-to-cart-btn" (click)="addToCart()">Add</button>
+        </div>
+
+        <!-- Product Details -->
+        <div class="product-details">
+          <div class="detail-item">
+            <strong>SKU:</strong> {{ product.id }}
+          </div>
+          <div class="detail-item">
+            <strong>Categories:</strong> {{ product.category }}
+          </div>
+          <div class="detail-item">
+            <strong>Tags:</strong>
+            <span *ngFor="let tag of product.tags; let last = last">
+              {{ tag }}<span *ngIf="!last">, </span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Social Share -->
+        <div class="social-share">
+          <span>Share:</span>
+          <button (click)="shareProduct('facebook')" class="share-btn facebook">f</button>
+          <button (click)="shareProduct('twitter')" class="share-btn twitter">t</button>
+          <button (click)="shareProduct('email')" class="share-btn email"></button>
+          <button (click)="shareProduct('link')" class="share-btn link">🔗</button>
+        </div>
+      </div>
+
+      <!-- Features Sidebar -->
+      <div class="features-sidebar">
+        <div class="feature-item" *ngFor="let feature of product.features">
+          <div class="feature-icon">
+            <span class="material-icons" *ngIf="feature.includes('SUPPORT')">support_agent</span>
+            <span class="material-icons" *ngIf="feature.includes('PAYMENT')">payment</span>
+            <span class="material-icons" *ngIf="feature.includes('SECURED')">lock</span>
+            <span class="material-icons" *ngIf="feature.includes('SHIPPING')">local_shipping</span>
+            <span class="material-icons" *ngIf="feature.includes('RETURN')">keyboard_return</span>
+          </div>
+          <div class="feature-text">
+            <div class="feature-title">{{ feature.split(' - ')[0] }}</div>
+            <div class="feature-desc">{{ feature.split(' - ')[1] }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Tabs -->
+    <div class="product-tabs">
+      <div class="tab-navigation">
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'description'"
+          (click)="setActiveTab('description')">
+          Description
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'specification'"
+          (click)="setActiveTab('specification')">
+          Specification
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'reviews'"
+          (click)="setActiveTab('reviews')">
+          Reviews ({{ product.reviews }})
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <div *ngIf="activeTab === 'description'" class="tab-panel">
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description }}</p>
+
+          <!-- Size Chart -->
+          <div class="size-chart-section">
+            <h4>SIZE CHART</h4>
+            <p><em>Size information: unit cm (hand measured, actual size may have discrepancy about 1-3cm)</em></p>
+
+            <div class="size-chart-toggle">
+              <button (click)="toggleSizeChart()" class="show-more-btn">
+                {{ showSizeChart ? 'Show Less' : 'Show More' }}
+              </button>
+            </div>
+
+            <table class="size-chart-table" *ngIf="showSizeChart">
+              <thead>
+                <tr>
+                  <th>US SIZE</th>
+                  <th>SHOULDER</th>
+                  <th>CHEST</th>
+                  <th>LENGTH</th>
+                  <th>SLEEVE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let size of sizeChart">
+                  <td>{{ size.size }}</td>
+                  <td>{{ size.shoulder }}</td>
+                  <td>{{ size.chest }}</td>
+                  <td>{{ size.length }}</td>
+                  <td>{{ size.sleeve }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'specification'" class="tab-panel">
+          <h3>Specification</h3>
+          <ul>
+            <li><strong>Brand:</strong> GuaGuanTa</li>
+            <li><strong>Sleeve Length:</strong> Short</li>
+            <li><strong>Shirt Type:</strong> Slim Style</li>
+            <li><strong>Style:</strong> Casual</li>
+            <li><strong>Decoration:</strong> Embroidery</li>
+            <li><strong>Material:</strong> Cotton blend</li>
+          </ul>
+        </div>
+
+        <div *ngIf="activeTab === 'reviews'" class="tab-panel">
+          <h3>Customer Reviews</h3>
+          <div class="review-summary">
+            <div class="rating-overview">
+              <div class="stars">
+                <span *ngFor="let star of getStars(product.rating)" class="star filled">★</span>
+              </div>
+              <span>{{ product.rating }}/5 based on {{ product.reviews }} reviews</span>
+            </div>
+          </div>
+          <p>No reviews yet. Be the first to review this product!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+      <h3>You might also like</h3>
+      <div class="related-grid">
+        <div class="related-item" *ngFor="let item of relatedProducts">
+          <img [src]="item.image" [alt]="item.name" />
+          <h4>{{ item.name }}</h4>
+          <div class="item-rating">
+            <span *ngFor="let star of getStars(item.rating)" class="star">★</span>
+          </div>
+          <div class="item-price">${{ item.price }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

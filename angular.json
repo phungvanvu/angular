@@ -16,14 +16,20 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+                  "src/favicon.ico",
+                  "src/assets",
+                  {
+                    "glob": "**/*",
+                    "input": "public",
+                    "output": "/"
+                  }
+                ],
             "styles": [
-              "src/styles.css"
-            ],
+              "@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/assets/vendors/css/bootstrap.min.css",
+              "src/assets/sass/main.scss"
+            ]
+              ,
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -74,17 +80,25 @@
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": [
-              "src/styles.css"
+              "@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/assets/sass/main.scss"
             ]
+            
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "bedb4c59-7ef4-4760-a0dd-aea75ee53552"
   }
 }

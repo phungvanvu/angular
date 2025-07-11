@@ -1,0 +1,57 @@
+<div class="main-content">
+    <h2>{{ title }}</h2>
+  <!-- Nút Create nằm ngoài box -->
+  <div class="page-header">
+    <button class="btn-create">Create {{ title.slice(0, -1) }}</button>
+  </div>
+  <!-- Box bo góc -->
+  <div class="table-box">
+    <!-- Thanh tìm kiếm -->
+    <div class="table-toolbar">
+        <div class="search-wrapper">
+            <span class="material-icons search-icon">search</span>
+            <input type="text" placeholder="Search here..." />
+        </div>
+    </div>
+    <!-- Bảng -->
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" /></th>
+          <th *ngFor="let col of columns">{{ col.header }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of data">
+          <td><input type="checkbox" /></td>
+          <td *ngFor="let col of columns">
+            <ng-container *ngIf="templates && templates[col.field]; else default">
+              <ng-container *ngTemplateOutlet="templates[col.field]; context: {$implicit: item[col.field], $row: item}"></ng-container>
+            </ng-container>
+            <ng-template #default>
+              <ng-container [ngSwitch]="col.field">
+
+                <!-- Thumbnail -->
+                <img *ngSwitchCase="'thumbnail'" [src]="item[col.field]" class="thumb-img" />
+
+                <!-- Price + OldPrice -->
+                <ng-container *ngSwitchCase="'price'">
+                  <span>{{ item[col.field] }}</span>
+                  <span *ngIf="item.oldPrice" class="old-price">{{ item.oldPrice }}</span>
+                </ng-container>
+
+                <!-- Badge -->
+                <span *ngSwitchCase="'stock'" class="badge badge-stock">{{ item[col.field] }}</span>
+                <span *ngSwitchCase="'status'" class="badge badge-status">{{ item[col.field] }}</span>
+
+                <!-- Fallback default -->
+                <span *ngSwitchDefault>{{ item[col.field] }}</span>
+
+              </ng-container>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

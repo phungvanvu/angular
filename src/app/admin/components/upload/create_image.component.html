@@ -1,0 +1,59 @@
+<div class="file-manager-overlay">
+  <div class="file-manager-modal">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2>File Manager</h2>
+      <button class="close-btn">&times;</button>
+    </div>
+
+    <!-- CONTENT SCROLLABLE -->
+    <div class="modal-body">
+      <div class="content-box">
+        <!-- DROP ZONE -->
+        <div class="drop-zone">
+          Drop files here or click to upload
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+          <div class="left">
+            Show 
+            <select>
+              <option>20</option>
+              <option>50</option>
+            </select>
+            entries
+            <button class="btn-delete">Delete</button>
+          </div>
+          <div class="right">
+            <input type="text" placeholder="Search here..." />
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <table class="file-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" /></th>
+              <th>ID</th>
+              <th>Thumbnail</th>
+              <th>Filename</th>
+              <th>Created</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let file of files">
+              <td><input type="checkbox" /></td>
+              <td>{{ file.id }}</td>
+              <td><img [src]="file.thumbnail" alt="thumb" /></td>
+              <td>{{ file.name }}</td>
+              <td>{{ file.created }}</td>
+              <td><button class="btn-insert">Insert</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

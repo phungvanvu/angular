@@ -1,0 +1,54 @@
+<div class="login-container">
+  <div class="login-left">
+    <img src="/images/backgroung.png" alt="Login Image">
+  </div>
+  <div class="login-right">
+    <div class="auth-form">
+      <div class="auth-form-header">
+        <div class="auth-form-header-content">
+          <div class="auth-form-header-top">
+            <div class="auth-form-header-logo">
+              <img src="https://asia.fleetcart.envaysoft.com/storage/media/ZUbiGSwHsOoIOEMKbqLjth8BitJ3K9pEgJxCKvVR.svg" alt="">
+            </div>
+          </div>
+          <h2>Welcome</h2>
+          <p>Enter your details below to sign in into your account.</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="input-label">Email <span>*</span></label>
+        <div class="input-icon-wrapper">
+          <span class="material-icons">mail</span>
+          <input type="email" id="email" placeholder="Nhập email" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="input-label">Mật khẩu <span>*</span></label>
+        <div class="input-icon-wrapper">
+          <span class="material-icons">lock</span>
+          <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center">
+            <input type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            <span class="ml-5 text-sm text-gray-600">Remember Me</span>
+          </label>
+          <a href="/forgot-password" class="text-sm text-blue-600 hover:underline">Forgot Password?</a>
+        </div>
+      </div>
+      <div class="form-group">
+        <button 
+          type="button"
+          (click)="signIn()"
+          class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+          Sign In
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
