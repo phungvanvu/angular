@@ -15,7 +15,6 @@
   height: 100vh;
   width: 100%;
   object-fit: cover;
-
 }
 
 .login-right {
@@ -29,7 +28,7 @@
 
 .auth-form {
   width: 446px;
-  
+
   position: relative;
   z-index: 11;
   margin-left: auto;
@@ -45,7 +44,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px
+  margin-bottom: 25px;
 }
 .auth-form-header-logo {
   width: max-content;
@@ -73,7 +72,6 @@
 }
 .auth-form-header p {
   color: #626f84;
-
 }
 .input-label {
   display: inline-block;
@@ -104,6 +102,11 @@
   width: 100%;
   box-sizing: border-box;
 }
+.error-input {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -123,7 +126,6 @@
 .form-group input[type="checkbox"] {
   width: 16px;
   height: 16px;
-
 }
 
 .form-group a {
@@ -143,3 +145,34 @@
   background-color: #5ea2eb;
 }
 
+/* Thông báo lỗi tổng thể */
+.form-error-message {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid #fca5a5;
+}
+
+/* Thông báo lỗi ngay dưới input */
+.error-message {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: -12px;
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+/* Label bị lỗi */
+.label-error {
+  color: #dc2626;
+}
+
+/* Input bị lỗi */
+.error-input {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2;
+}

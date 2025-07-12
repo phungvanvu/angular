@@ -5,15 +5,19 @@
       <div class="header-left">
         <div class="logo">TechShop</div>
         <nav class="nav">
-          <a href="#" class="nav-link">Home</a>
-          <a href="#" class="nav-link active">Shop</a>
+          <a href="home" class="nav-link">Home</a>
+          <a href="shop" class="nav-link active">Shop</a>
           <a href="#" class="nav-link">Categories</a>
           <a href="#" class="nav-link">Deals</a>
         </nav>
       </div>
       <div class="header-right">
         <div class="search-box">
-          <input type="text" placeholder="Search products..." class="search-input">
+          <input
+            type="text"
+            placeholder="Search products..."
+            class="search-input"
+          />
           <span class="material-icons search-icon">search</span>
         </div>
         <button class="icon-btn">
@@ -43,7 +47,8 @@
             *ngFor="let image of product.images; let i = index"
             class="thumbnail"
             [class.active]="selectedImage === i"
-            (click)="selectImage(i)">
+            (click)="selectImage(i)"
+          >
             <img [src]="image" [alt]="'Product image ' + (i + 1)" />
           </div>
         </div>
@@ -59,7 +64,8 @@
             <span
               *ngFor="let star of getStars(product.rating)"
               class="star"
-              [class.filled]="star === 'star'">
+              [class.filled]="star === 'star'"
+            >
               ★
             </span>
           </div>
@@ -88,7 +94,12 @@
             <label>Quantity:</label>
             <div class="quantity-controls">
               <button (click)="changeQuantity(-1)" class="qty-btn">-</button>
-              <input type="number" [(ngModel)]="quantity" min="1" class="qty-input" />
+              <input
+                type="number"
+                [(ngModel)]="quantity"
+                min="1"
+                class="qty-input"
+              />
               <button (click)="changeQuantity(1)" class="qty-btn">+</button>
             </div>
           </div>
@@ -97,9 +108,7 @@
 
         <!-- Product Details -->
         <div class="product-details">
-          <div class="detail-item">
-            <strong>SKU:</strong> {{ product.id }}
-          </div>
+          <div class="detail-item"><strong>SKU:</strong> {{ product.id }}</div>
           <div class="detail-item">
             <strong>Categories:</strong> {{ product.category }}
           </div>
@@ -114,10 +123,19 @@
         <!-- Social Share -->
         <div class="social-share">
           <span>Share:</span>
-          <button (click)="shareProduct('facebook')" class="share-btn facebook">f</button>
-          <button (click)="shareProduct('twitter')" class="share-btn twitter">t</button>
-          <button (click)="shareProduct('email')" class="share-btn email"></button>
-          <button (click)="shareProduct('link')" class="share-btn link">🔗</button>
+          <button (click)="shareProduct('facebook')" class="share-btn facebook">
+            f
+          </button>
+          <button (click)="shareProduct('twitter')" class="share-btn twitter">
+            t
+          </button>
+          <button
+            (click)="shareProduct('email')"
+            class="share-btn email"
+          ></button>
+          <button (click)="shareProduct('link')" class="share-btn link">
+            🔗
+          </button>
         </div>
       </div>
 
@@ -125,15 +143,25 @@
       <div class="features-sidebar">
         <div class="feature-item" *ngFor="let feature of product.features">
           <div class="feature-icon">
-            <span class="material-icons" *ngIf="feature.includes('SUPPORT')">support_agent</span>
-            <span class="material-icons" *ngIf="feature.includes('PAYMENT')">payment</span>
-            <span class="material-icons" *ngIf="feature.includes('SECURED')">lock</span>
-            <span class="material-icons" *ngIf="feature.includes('SHIPPING')">local_shipping</span>
-            <span class="material-icons" *ngIf="feature.includes('RETURN')">keyboard_return</span>
+            <span class="material-icons" *ngIf="feature.includes('SUPPORT')"
+              >support_agent</span
+            >
+            <span class="material-icons" *ngIf="feature.includes('PAYMENT')"
+              >payment</span
+            >
+            <span class="material-icons" *ngIf="feature.includes('SECURED')"
+              >lock</span
+            >
+            <span class="material-icons" *ngIf="feature.includes('SHIPPING')"
+              >local_shipping</span
+            >
+            <span class="material-icons" *ngIf="feature.includes('RETURN')"
+              >keyboard_return</span
+            >
           </div>
           <div class="feature-text">
-            <div class="feature-title">{{ feature.split(' - ')[0] }}</div>
-            <div class="feature-desc">{{ feature.split(' - ')[1] }}</div>
+            <div class="feature-title">{{ feature.split(" - ")[0] }}</div>
+            <div class="feature-desc">{{ feature.split(" - ")[1] }}</div>
           </div>
         </div>
       </div>
@@ -145,19 +173,22 @@
         <button
           class="tab-btn"
           [class.active]="activeTab === 'description'"
-          (click)="setActiveTab('description')">
+          (click)="setActiveTab('description')"
+        >
           Description
         </button>
         <button
           class="tab-btn"
           [class.active]="activeTab === 'specification'"
-          (click)="setActiveTab('specification')">
+          (click)="setActiveTab('specification')"
+        >
           Specification
         </button>
         <button
           class="tab-btn"
           [class.active]="activeTab === 'reviews'"
-          (click)="setActiveTab('reviews')">
+          (click)="setActiveTab('reviews')"
+        >
           Reviews ({{ product.reviews }})
         </button>
       </div>
@@ -170,11 +201,16 @@
           <!-- Size Chart -->
           <div class="size-chart-section">
             <h4>SIZE CHART</h4>
-            <p><em>Size information: unit cm (hand measured, actual size may have discrepancy about 1-3cm)</em></p>
+            <p>
+              <em
+                >Size information: unit cm (hand measured, actual size may have
+                discrepancy about 1-3cm)</em
+              >
+            </p>
 
             <div class="size-chart-toggle">
               <button (click)="toggleSizeChart()" class="show-more-btn">
-                {{ showSizeChart ? 'Show Less' : 'Show More' }}
+                {{ showSizeChart ? "Show Less" : "Show More" }}
               </button>
             </div>
 
@@ -218,9 +254,16 @@
           <div class="review-summary">
             <div class="rating-overview">
               <div class="stars">
-                <span *ngFor="let star of getStars(product.rating)" class="star filled">★</span>
+                <span
+                  *ngFor="let star of getStars(product.rating)"
+                  class="star filled"
+                  >★</span
+                >
               </div>
-              <span>{{ product.rating }}/5 based on {{ product.reviews }} reviews</span>
+              <span
+                >{{ product.rating }}/5 based on
+                {{ product.reviews }} reviews</span
+              >
             </div>
           </div>
           <p>No reviews yet. Be the first to review this product!</p>
@@ -236,7 +279,9 @@
           <img [src]="item.image" [alt]="item.name" />
           <h4>{{ item.name }}</h4>
           <div class="item-rating">
-            <span *ngFor="let star of getStars(item.rating)" class="star">★</span>
+            <span *ngFor="let star of getStars(item.rating)" class="star"
+              >★</span
+            >
           </div>
           <div class="item-price">${{ item.price }}</div>
         </div>

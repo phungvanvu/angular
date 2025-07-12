@@ -1,54 +1,114 @@
 <div class="login-container">
   <div class="login-left">
-    <img src="/images/backgroung.png" alt="Login Image">
+    <img src="/images/backgroung.png" alt="Login Image" />
   </div>
+
   <div class="login-right">
-    <div class="auth-form">
+    <form class="auth-form" #form="ngForm" (ngSubmit)="signIn(form)">
+      <!-- Tiêu đề -->
       <div class="auth-form-header">
         <div class="auth-form-header-content">
           <div class="auth-form-header-top">
             <div class="auth-form-header-logo">
-              <img src="https://asia.fleetcart.envaysoft.com/storage/media/ZUbiGSwHsOoIOEMKbqLjth8BitJ3K9pEgJxCKvVR.svg" alt="">
+              <img
+                src="https://asia.fleetcart.envaysoft.com/storage/media/ZUbiGSwHsOoIOEMKbqLjth8BitJ3K9pEgJxCKvVR.svg"
+                alt="Logo"
+              />
             </div>
           </div>
-          <h2>Welcome</h2>
-          <p>Enter your details below to sign in into your account.</p>
+          <h2>Chào mừng</h2>
+          <p>Vui lòng nhập thông tin để đăng nhập.</p>
         </div>
       </div>
 
+      <!-- Lỗi tổng thể -->
+      <div *ngIf="error" class="form-error-message">
+        {{ error }}
+      </div>
+
+      <!-- Email -->
       <div class="form-group">
-        <label for="email" class="input-label">Email <span>*</span></label>
+        <label
+          for="email"
+          class="input-label"
+          [ngClass]="{ 'label-error': emailError }"
+        >
+          Email <span>*</span>
+        </label>
         <div class="input-icon-wrapper">
           <span class="material-icons">mail</span>
-          <input type="email" id="email" placeholder="Nhập email" required>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Nhập email"
+            [(ngModel)]="email"
+            #emailModel="ngModel"
+            [ngClass]="{ 'error-input': emailError }"
+          />
+        </div>
+        <div *ngIf="emailError" class="error-message">
+          {{ emailError }}
         </div>
       </div>
 
+      <!-- Password -->
       <div class="form-group">
-        <label for="password" class="input-label">Mật khẩu <span>*</span></label>
+        <label
+          for="password"
+          class="input-label"
+          [ngClass]="{ 'label-error': passwordError }"
+        >
+          Mật khẩu <span>*</span>
+        </label>
         <div class="input-icon-wrapper">
           <span class="material-icons">lock</span>
-          <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Nhập mật khẩu"
+            [(ngModel)]="password"
+            #passwordModel="ngModel"
+            [ngClass]="{ 'error-input': passwordError }"
+          />
+        </div>
+        <div *ngIf="passwordError" class="error-message">
+          {{ passwordError }}
         </div>
       </div>
 
+      <!-- Ghi nhớ + Quên mật khẩu -->
       <div class="form-group">
         <div class="flex items-center justify-between">
-          <label class="flex items-center">
-            <input type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-            <span class="ml-5 text-sm text-gray-600">Remember Me</span>
+          <label
+            class="flex items-center space-x-2 text-sm text-gray-600 leading-none"
+          >
+            <input
+              type="checkbox"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded align-middle"
+            />
+            <span>Nhớ mật khẩu</span>
           </label>
-          <a href="/forgot-password" class="text-sm text-blue-600 hover:underline">Forgot Password?</a>
+
+          <a
+            href="/forgot-password"
+            class="text-sm text-blue-600 hover:underline font-medium"
+          >
+            Quên mật khẩu?
+          </a>
         </div>
       </div>
+
+      <!-- Submit -->
       <div class="form-group">
-        <button 
-          type="button"
-          (click)="signIn()"
-          class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-          Sign In
+        <button
+          type="submit"
+          class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Đăng nhập
         </button>
       </div>
-    </div>
+    </form>
   </div>
 </div>
