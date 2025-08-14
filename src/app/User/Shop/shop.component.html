@@ -1,4 +1,15 @@
 <div class="shop-container">
+  <shoppingcart
+    [isCartOpen]="isCartOpen"
+    [closeCart]="closeCart.bind(this)"
+  ></shoppingcart>
+
+  <div class="toast-message" *ngIf="toastVisible">
+    <span class="material-icons toast-icon">check_circle</span>
+    <span class="toast-text">{{ toastText }}</span>
+    <div class="toast-progress"></div>
+  </div>
+
   <!-- Header -->
   <header class="header">
     <div class="header-content">
@@ -16,6 +27,8 @@
         <div class="search-box">
           <input
             type="text"
+            [(ngModel)]="searchKeyword"
+            (ngModelChange)="onSearchInput($event)"
             placeholder="Search products..."
             class="search-input"
           />
@@ -24,7 +37,11 @@
         <button class="icon-btn">
           <span class="material-icons icon">favorite_border</span>
         </button>
-        <button class="icon-btn cart-btn">
+        <button
+          class="icon-btn cart-btn"
+          data-cy="open-cart"
+          (click)="isCartOpen = !isCartOpen"
+        >
           <span class="material-icons icon">shopping_cart</span>
           <span class="cart-badge">{{ cartItems }}</span>
         </button>
@@ -76,6 +93,7 @@
             <input
               type="number"
               [(ngModel)]="priceRange[0]"
+              (input)="onPriceRangeChange($event)"
               class="price-input"
               min="0"
             />
@@ -83,14 +101,15 @@
             <input
               type="number"
               [(ngModel)]="priceRange[1]"
+              (input)="onPriceRangeChange($event)"
               class="price-input"
               min="0"
             />
           </div>
           <input
             type="range"
-            min="2"
-            max="7499"
+            min="0"
+            max="50000000"
             [value]="priceRange[1]"
             (input)="onPriceRangeChange($event)"
             class="price-range"
@@ -103,14 +122,18 @@
           <div class="latest-products">
             <div *ngFor="let product of latestProducts" class="latest-product">
               <div class="latest-product-image">
-                <span class="material-icons">headphones</span>
+                <img
+                  [src]="product.image"
+                  [alt]="product.name"
+                  class="latest-product-image-img"
+                />
               </div>
               <div class="latest-product-info">
                 <p class="latest-product-name">{{ product.name }}</p>
                 <div class="latest-product-price">
-                  <span class="current-price">${{ product.price }}</span>
-                  <span *ngIf="product.originalPrice" class="original-price"
-                    >${{ product.originalPrice }}</span
+                  <span class="current-price"
+                    >{{ product.minPrice.toLocaleString("vi-VN") }} -
+                    {{ product.maxPrice.toLocaleString("vi-VN") }} ₫</span
                   >
                 </div>
               </div>
@@ -202,27 +225,11 @@
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
 
-            <div class="product-rating">
-              <div class="stars">
-                <span
-                  *ngFor="let star of generateStars(product.rating)"
-                  class="material-icons star"
-                  [class.filled]="star"
-                  >star</span
-                >
-              </div>
-              <span class="reviews-count"
-                >{{ product.reviews }} Review{{
-                  product.reviews !== 1 ? "s" : ""
-                }}</span
-              >
-            </div>
-
             <div class="product-pricing">
-              <span class="current-price">${{ product.price.toFixed(2) }}</span>
-              <span *ngIf="product.originalPrice" class="original-price">
-                ${{ product.originalPrice.toFixed(2) }}
-              </span>
+              <span class="current-price"
+                >{{ product.minPrice.toLocaleString("vi-VN") }} -
+                {{ product.maxPrice.toLocaleString("vi-VN") }} ₫</span
+              >
             </div>
 
             <button
@@ -241,12 +248,31 @@
       </div>
 
       <!-- Pagination -->
-      <div class="pagination">
-        <button class="page-btn" disabled>Previous</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn">Next</button>
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="page-btn"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()"
+        >
+          Next
+        </button>
       </div>
     </main>
   </div>

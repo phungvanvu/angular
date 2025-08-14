@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Global font family */
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+/* Reset margins and paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+  font-family: "Roboto", sans-serif;
+  line-height: 1.6;
+  color: #333;
+}

@@ -1,0 +1,171 @@
+<div class="checkout-container">
+  <!-- Đổi class để đồng bộ container -->
+  <!-- Header step (giữ nguyên, đồng bộ hoàn toàn) -->
+  <div class="checkout-header">
+    <div
+      class="step-item"
+      [class.completed]="isCompletedStep(1)"
+      [class.current]="isCurrentStep(1)"
+    >
+      <span class="step-number">1</span>
+      <span class="step-title">My Cart</span>
+    </div>
+
+    <div
+      class="step-item"
+      [class.completed]="isCompletedStep(2)"
+      [class.current]="isCurrentStep(2)"
+    >
+      <span class="step-number">2</span>
+      <span class="step-title">Checkout</span>
+    </div>
+
+    <div
+      class="step-item"
+      [class.completed]="isCompletedStep(3)"
+      [class.current]="isCurrentStep(3)"
+    >
+      <span class="step-number">3</span>
+      <span class="step-title">Order Complete</span>
+    </div>
+  </div>
+
+  <div class="content checkout-content">
+    <!-- Thêm class để đồng bộ content -->
+    <div *ngIf="loading" class="loading">Đang tải thông tin đơn hàng...</div>
+
+    <div *ngIf="error" class="error-box">{{ error }}</div>
+
+    <div *ngIf="!loading && order" class="order-panel checkout-form">
+      <!-- Thêm class để đồng bộ panel như form -->
+      <div class="success-head">
+        <mat-icon class="material-icons">check_circle</mat-icon>
+        <div>
+          <h2>Đặt hàng thành công!</h2>
+          <p>
+            Order #: <strong>{{ order.id }}</strong>
+          </p>
+          <p class="muted">Ngày: {{ order.createdAt | date : "medium" }}</p>
+        </div>
+      </div>
+
+      <div class="order-meta form-section">
+        <!-- Thêm class form-section để đồng bộ -->
+        <h2 class="section-title">Order Meta</h2>
+        <!-- Thêm title để khớp -->
+        <div>
+          <strong>Trạng thái:</strong>
+          <span class="status">{{ order.status }}</span>
+        </div>
+        <div>
+          <strong>Phương thức thanh toán:</strong> {{ order.paymentMethod }}
+        </div>
+        <div *ngIf="order.transactions?.length">
+          <strong>Giao dịch:</strong>
+          <ul class="txn-list">
+            <li *ngFor="let t of order.transactions">
+              <div>
+                ID giao dịch: <strong>{{ t.transactionId }}</strong>
+              </div>
+              <div>Phương thức: {{ t.paymentMethod }}</div>
+              <div>Thời gian: {{ t.createdAt | date : "medium" }}</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <section class="addresses form-section">
+        <!-- Thêm class form-section -->
+        <h2 class="section-title">Addresses</h2>
+        <div class="form-row">
+          <!-- Sử dụng form-row để chia 2 cột như checkout -->
+          <div class="card form-group">
+            <h3>Billing Details</h3>
+            <p>{{ order.billingFirstName }} {{ order.billingLastName }}</p>
+            <p>
+              {{ order.billingAddress1 }}
+              <span *ngIf="order.billingAddress2"
+                >, {{ order.billingAddress2 }}</span
+              >
+            </p>
+            <p>
+              {{ order.billingCity }} {{ order.billingZip }} -
+              {{ order.billingState }}
+            </p>
+            <p>{{ order.billingCountry }}</p>
+            <p>
+              Email/Phone: {{ order.customerEmail }} / {{ order.customerPhone }}
+            </p>
+          </div>
+
+          <div class="card form-group">
+            <h3>Shipping Details</h3>
+            <p>{{ order.shippingFirstName }} {{ order.shippingLastName }}</p>
+            <p>
+              {{ order.shippingAddress1 }}
+              <span *ngIf="order.shippingAddress2"
+                >, {{ order.shippingAddress2 }}</span
+              >
+            </p>
+            <p>
+              {{ order.shippingCity }} {{ order.shippingZip }} -
+              {{ order.shippingState }}
+            </p>
+            <p>{{ order.shippingCountry }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="products form-section">
+        <h2 class="section-title">Order Items</h2>
+        <div class="product-item" *ngFor="let p of order.orderProducts">
+          <img
+            [src]="imageSrc(p.productThumbnail)"
+            [alt]="p.productName"
+            class="thumb"
+          />
+          <div class="p-info">
+            <div class="p-name">{{ p.productName }}</div>
+            <div class="p-variant">
+              Variant: {{ p.variantName }} (SKU: {{ p.sku }})
+            </div>
+            <div class="p-qty">Số lượng: {{ p.qty }}</div>
+          </div>
+          <div class="p-price">{{ formatPrice(p.lineTotal) }}</div>
+        </div>
+      </section>
+
+      <section class="price-summary form-section">
+        <!-- Thêm form-section, nhưng giữ max-width như checkout -->
+        <h2 class="section-title">Price Summary</h2>
+        <div class="row">
+          <span>Subtotal</span><span>{{ formatPrice(order.subTotal) }}</span>
+        </div>
+        <div class="row">
+          <span>Shipping</span
+          ><span>{{ formatPrice(order.shippingCost) }}</span>
+        </div>
+        <div class="row">
+          <span>Discount</span
+          ><span>-{{ formatPrice(order.discount || 0) }}</span>
+        </div>
+        <div class="row total">
+          <span>Total</span><span>{{ formatPrice(order.total) }}</span>
+        </div>
+      </section>
+
+      <section class="note form-section">
+        <h2 class="section-title">Ghi chú</h2>
+        <p *ngIf="order.note; else noNote">{{ order.note }}</p>
+        <ng-template #noNote
+          ><p class="muted">Không có ghi chú.</p></ng-template
+        >
+      </section>
+
+      <div class="actions">
+        <a routerLink="/home" class="btn">Quay về trang chủ</a>
+        <!-- <button class="btn" (click)="printInvoice()">In hóa đơn</button> -->
+      </div>
+    </div>
+  </div>
+</div>

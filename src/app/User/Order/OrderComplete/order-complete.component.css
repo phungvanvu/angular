@@ -1,0 +1,400 @@
+/* Container chung (đồng bộ với checkout) */
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial;
+  background-color: #f8f9fa;
+  color: #222;
+}
+
+/* Header (đồng bộ hoàn toàn) */
+.checkout-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 20px 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header với các bước checkout */
+.checkout-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling cho từng bước */
+.step-item {
+  display: flex;
+  align-items: center;
+  margin: 0 30px;
+  color: #ccc;
+  font-weight: 500;
+  position: relative;
+}
+
+.step-item.current {
+  color: #007bff;
+}
+
+.step-item.completed {
+  color: #28a745;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #6c757d;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.step-item.current .step-number {
+  background-color: #007bff;
+  color: white;
+}
+
+.step-item.completed .step-number {
+  background-color: #28a745;
+  color: white;
+}
+
+.checkout-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+.content {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.error-box {
+  padding: 14px;
+  background: #ffecec;
+  color: #a94442;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.order-panel {
+  display: grid;
+  gap: 16px;
+}
+
+/* Section title và form-section (đồng bộ với checkout) */
+.form-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+mat-icon.material-icons {
+  font-family: "Material Icons" !important;
+}
+
+.success-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.success-head mat-icon {
+  font-size: 44px;
+  color: #28a745;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+}
+
+.success-head h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.success-head .muted {
+  color: #666;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Order meta */
+.order-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: #333;
+}
+
+/* Addresses (sử dụng card như form-group) */
+.addresses {
+  gap: 12px;
+}
+
+.card {
+  padding: 12px;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+/* Products (đồng bộ với checkout) */
+.products {
+  margin-top: 8px;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-bottom: 1px solid #efefef;
+  transition: background 0.3s ease;
+}
+
+.product-item:hover {
+  background: #f2f4f7;
+}
+
+.thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.p-info {
+  flex: 1;
+}
+
+.p-name {
+  font-weight: 600;
+}
+
+.p-variant,
+.p-qty {
+  color: #666;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.p-price {
+  min-width: 120px;
+  text-align: right;
+  font-weight: 600;
+  color: #007bff;
+}
+
+/* Price summary (đồng bộ hoàn toàn) */
+.price-summary {
+  border-top: 1px dashed #eee;
+  padding-top: 12px;
+  max-width: 420px;
+  margin-left: auto;
+}
+
+.price-summary .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  color: #333;
+}
+
+.price-summary .total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  margin-top: 8px;
+}
+
+/* Note */
+.note p {
+  margin: 0;
+}
+
+.muted {
+  color: #777;
+  font-size: 13px;
+}
+
+/* Actions (buttons đồng bộ) */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #007bff;
+  color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn.outline {
+  background: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.txn-list {
+  margin: 6px 0 0 0;
+  padding-left: 16px;
+}
+
+.txn-list li {
+  margin-bottom: 6px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #f0f0f0;
+  font-size: 13px;
+  color: #444;
+}
+
+/* Responsive (đồng bộ với checkout) */
+@media (max-width: 800px) {
+  .checkout-header {
+    flex-direction: column;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .addresses {
+    flex-direction: column;
+  }
+
+  .price-summary {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .product-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .thumb {
+    margin-bottom: 10px;
+  }
+}
+
+@media print {
+  /* Ẩn các phần không cần in như header, menu, button */
+  .checkout-header,
+  .actions,
+  .toast-message,
+  .btn {
+    display: none !important;
+  }
+
+  /* Bỏ padding/margin dư thừa */
+  body,
+  .checkout-container {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Giữ layout cột ở addresses */
+  .form-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+  }
+  .form-group {
+    flex: 1;
+  }
+
+  /* Giữ bảng sản phẩm ngay hàng thẳng lối */
+  .product-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    page-break-inside: avoid; /* Tránh bị cắt giữa trang */
+  }
+  .product-item img.thumb {
+    width: 60px;
+    height: auto;
+    margin-right: 12px;
+  }
+  .p-info {
+    flex: 1;
+  }
+  .p-price {
+    text-align: right;
+    min-width: 80px;
+  }
+
+  /* Tóm tắt giá */
+  .price-summary .row {
+    display: flex;
+    justify-content: space-between;
+  }
+  .price-summary .total {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+  /* Chữ rõ ràng khi in */
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    color: #000;
+  }
+}

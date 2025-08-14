@@ -73,6 +73,32 @@
 .auth-form-header p {
   color: #626f84;
 }
+
+.auth-button {
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #2563eb; /* blue-600 */
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.auth-button:hover {
+  background-color: #1d4ed8; /* darker blue */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.auth-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* soft focus ring */
+}
+
 .input-label {
   display: inline-block;
   margin-bottom: 6px;

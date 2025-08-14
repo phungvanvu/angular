@@ -1,0 +1,444 @@
+<!-- Container chính của trang checkout -->
+<div class="checkout-container">
+  <!-- Header với các bước checkout -->
+  <div class="checkout-header">
+    <div
+      class="step-item"
+      [class.completed]="isCompletedStep(1)"
+      [class.current]="isCurrentStep(1)"
+    >
+      <span class="step-number">1</span>
+      <span class="step-title">My Cart</span>
+    </div>
+    <div
+      class="step-item"
+      [class.completed]="isCompletedStep(2)"
+      [class.current]="isCurrentStep(2)"
+    >
+      <span class="step-number">2</span>
+      <span class="step-title">Checkout</span>
+    </div>
+    <div
+      class="step-item"
+      [class.completed]="isCompletedStep(3)"
+      [class.current]="isCurrentStep(3)"
+    >
+      <span class="step-number">3</span>
+      <span class="step-title">Order Complete</span>
+    </div>
+  </div>
+
+  <!-- Nội dung chính chia thành 2 cột -->
+  <div class="checkout-content">
+    <!-- Cột trái: Form thông tin -->
+    <div class="checkout-form">
+      <!-- Phần thông tin tài khoản -->
+      <div class="form-section">
+        <h2 class="section-title">Account Details</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input
+              type="email"
+              id="email"
+              [(ngModel)]="accountDetails.email"
+              class="form-input"
+              placeholder="Enter your email"
+              required
+            />
+            <span class="error" *ngIf="errors['customerEmail']">{{
+              errors["customerEmail"]
+            }}</span>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone <span class="required">*</span></label>
+            <input
+              type="tel"
+              id="phone"
+              [(ngModel)]="accountDetails.phone"
+              class="form-input"
+              placeholder="Enter your phone"
+              required
+            />
+            <span class="error" *ngIf="errors['customerPhone']">{{
+              errors["customerPhone"]
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phần thông tin thanh toán -->
+      <div class="form-section">
+        <h2 class="section-title">Billing Details</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="billingFirstName"
+              >First Name <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="billingFirstName"
+              [(ngModel)]="billingDetails.firstName"
+              class="form-input"
+              placeholder="Enter first name"
+              required
+            />
+            <span class="error" *ngIf="errors['billingFirstName']">{{
+              errors["billingFirstName"]
+            }}</span>
+          </div>
+          <div class="form-group">
+            <label for="billingLastName"
+              >Last Name <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="billingLastName"
+              [(ngModel)]="billingDetails.lastName"
+              class="form-input"
+              placeholder="Enter last name"
+              required
+            />
+            <span class="error" *ngIf="errors['billingLastName']">{{
+              errors["billingLastName"]
+            }}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="billingAddress1"
+            >Street Address <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="billingAddress1"
+            [(ngModel)]="billingDetails.address1"
+            class="form-input"
+            placeholder="Address Line 1"
+            required
+          />
+          <span class="error" *ngIf="errors['billingAddress1']">{{
+            errors["billingAddress1"]
+          }}</span>
+          <input
+            type="text"
+            id="billingAddress2"
+            [(ngModel)]="billingDetails.address2"
+            class="form-input mt-2"
+            placeholder="Address Line 2 (optional)"
+          />
+          <span class="error" *ngIf="errors['billingAddress2']">{{
+            errors["billingAddress2"]
+          }}</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="billingCity"
+              >City <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="billingCity"
+              [(ngModel)]="billingDetails.city"
+              class="form-input"
+              placeholder="Enter city"
+              required
+            />
+            <span class="error" *ngIf="errors['billingCity']">{{
+              errors["billingCity"]
+            }}</span>
+          </div>
+          <div class="form-group">
+            <label for="billingState">State/Province</label>
+            <input
+              type="text"
+              id="billingState"
+              [(ngModel)]="billingDetails.state"
+              class="form-input"
+              placeholder="Enter state"
+            />
+            <span class="error" *ngIf="errors['billingState']">{{
+              errors["billingState"]
+            }}</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="billingZip">Postcode / ZIP</label>
+            <input
+              type="text"
+              id="billingZip"
+              [(ngModel)]="billingDetails.zip"
+              class="form-input"
+              placeholder="Enter postcode"
+            />
+            <span class="error" *ngIf="errors['billingZip']">{{
+              errors["billingZip"]
+            }}</span>
+          </div>
+          <div class="form-group">
+            <label for="billingCountry"
+              >Country <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="billingCountry"
+              [(ngModel)]="billingDetails.country"
+              class="form-input"
+              placeholder="Enter country"
+              required
+            />
+            <span class="error" *ngIf="errors['billingCountry']">{{
+              errors["billingCountry"]
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phần thông tin giao hàng -->
+      <div class="form-section">
+        <h2 class="section-title">Shipping Details</h2>
+        <div class="checkbox-group">
+          <input
+            type="checkbox"
+            id="sameAsBilling"
+            [(ngModel)]="sameAsBilling"
+          />
+          <label for="sameAsBilling"
+            >Ship to the same address as billing?</label
+          >
+        </div>
+        <div *ngIf="!sameAsBilling">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="shippingFirstName">First Name</label>
+              <input
+                type="text"
+                id="shippingFirstName"
+                [(ngModel)]="shippingDetails.firstName"
+                class="form-input"
+                placeholder="Enter first name"
+              />
+              <span class="error" *ngIf="errors['shippingFirstName']">{{
+                errors["shippingFirstName"]
+              }}</span>
+            </div>
+            <div class="form-group">
+              <label for="shippingLastName">Last Name</label>
+              <input
+                type="text"
+                id="shippingLastName"
+                [(ngModel)]="shippingDetails.lastName"
+                class="form-input"
+                placeholder="Enter last name"
+              />
+              <span class="error" *ngIf="errors['shippingLastName']">{{
+                errors["shippingLastName"]
+              }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="shippingAddress1">Street Address</label>
+            <input
+              type="text"
+              id="shippingAddress1"
+              [(ngModel)]="shippingDetails.address1"
+              class="form-input"
+              placeholder="Address Line 1"
+            />
+            <span class="error" *ngIf="errors['shippingAddress1']">{{
+              errors["shippingAddress1"]
+            }}</span>
+            <input
+              type="text"
+              id="shippingAddress2"
+              [(ngModel)]="shippingDetails.address2"
+              class="form-input mt-2"
+              placeholder="Address Line 2 (optional)"
+            />
+            <span class="error" *ngIf="errors['shippingAddress2']">{{
+              errors["shippingAddress2"]
+            }}</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="shippingCity">City</label>
+              <input
+                type="text"
+                id="shippingCity"
+                [(ngModel)]="shippingDetails.city"
+                class="form-input"
+                placeholder="Enter city"
+              />
+              <span class="error" *ngIf="errors['shippingCity']">{{
+                errors["shippingCity"]
+              }}</span>
+            </div>
+            <div class="form-group">
+              <label for="shippingState">State/Province</label>
+              <input
+                type="text"
+                id="shippingState"
+                [(ngModel)]="shippingDetails.state"
+                class="form-input"
+                placeholder="Enter state"
+              />
+              <span class="error" *ngIf="errors['shippingState']">{{
+                errors["shippingState"]
+              }}</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="shippingZip">Postcode / ZIP</label>
+              <input
+                type="text"
+                id="shippingZip"
+                [(ngModel)]="shippingDetails.zip"
+                class="form-input"
+                placeholder="Enter postcode"
+              />
+              <span class="error" *ngIf="errors['shippingZip']">{{
+                errors["shippingZip"]
+              }}</span>
+            </div>
+            <div class="form-group">
+              <label for="shippingCountry">Country</label>
+              <input
+                type="text"
+                id="shippingCountry"
+                [(ngModel)]="shippingDetails.country"
+                class="form-input"
+                placeholder="Enter country"
+              />
+              <span class="error" *ngIf="errors['shippingCountry']">{{
+                errors["shippingCountry"]
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phần phương thức giao hàng và thanh toán -->
+      <div class="form-section">
+        <h2 class="section-title">Shipping & Payment</h2>
+        <div class="form-group">
+          <label for="shippingMethod"
+            >Shipping Method <span class="required">*</span></label
+          >
+          <select
+            id="shippingMethod"
+            [(ngModel)]="orderDetails.shippingMethod"
+            class="form-input"
+            required
+          >
+            <option value="Standard">Standard</option>
+          </select>
+          <span class="error" *ngIf="errors['shippingMethod']">{{
+            errors["shippingMethod"]
+          }}</span>
+        </div>
+        <div class="form-group">
+          <label for="paymentMethod"
+            >Payment Method <span class="required">*</span></label
+          >
+          <select
+            id="paymentMethod"
+            [(ngModel)]="orderDetails.paymentMethod"
+            class="form-input"
+            required
+          >
+            <option value="COD">Cash on Delivery</option>
+            <option value="DEBIT_CARD">Debit Card</option>
+          </select>
+          <span class="error" *ngIf="errors['paymentMethod']">{{
+            errors["paymentMethod"]
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Phần ghi chú -->
+      <div class="form-section">
+        <h2 class="section-title">Additional Notes</h2>
+        <div class="form-group">
+          <label for="note">Order Note</label>
+          <textarea
+            id="note"
+            [(ngModel)]="orderDetails.note"
+            class="form-input"
+            rows="4"
+            placeholder="Enter any additional notes (e.g., Giao trong giờ hành chính)"
+          ></textarea>
+          <span class="error" *ngIf="errors['note']">{{ errors["note"] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Tóm tắt đơn hàng -->
+    <div class="order-summary">
+      <h2 class="section-title">Order Summary</h2>
+      <div class="product-item" *ngFor="let item of orderSummary.cartItems">
+        <img
+          [src]="item.product.image"
+          [alt]="item.product.name"
+          class="product-image"
+        />
+        <div class="product-details">
+          <h3 class="product-name">{{ item.product.name }}</h3>
+          <p class="product-storage">Variant: {{ item.product.variantName }}</p>
+          <p class="product-storage">Quantity: {{ item.quantity }}</p>
+        </div>
+        <div class="product-price">
+          {{ formatPrice(item.product.price * item.quantity) }}
+        </div>
+      </div>
+      <div class="coupon-section">
+        <div class="coupon-input-group">
+          <input
+            type="text"
+            [(ngModel)]="orderSummary.couponCode"
+            class="coupon-input"
+            placeholder="Enter coupon code"
+          />
+          <button (click)="applyCoupon()" class="apply-button">Apply</button>
+        </div>
+        <span class="error" *ngIf="errors['couponId']">{{
+          errors["couponId"]
+        }}</span>
+      </div>
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span>Subtotal</span>
+          <span>{{ formatPrice(orderSummary.subtotal) }}</span>
+        </div>
+        <div class="price-row">
+          <span>Shipping Cost</span>
+          <span>{{ formatPrice(orderSummary.shippingCost) }}</span>
+        </div>
+        <div class="price-row total">
+          <span>Total</span>
+          <span>{{ formatPrice(orderSummary.total) }}</span>
+        </div>
+      </div>
+      <!-- <div class="terms-checkbox">
+        <input type="checkbox" id="terms" required />
+        <label for="terms"
+          >I agree to the
+          <a href="#" class="terms-link">Terms & Conditions</a></label
+        >
+      </div> -->
+      <button (click)="submitOrder()" class="paypal-button">
+        <mat-icon>payment</mat-icon>
+        Place Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Nút mua ngay (floating) -->
+  <div class="buy-now-float">
+    <button class="buy-now-button" (click)="submitOrder()">
+      <mat-icon>shopping_cart</mat-icon>
+      <span>Buy Now</span>
+      <div class="price-badge">{{ formatPrice(orderSummary.total) }}</div>
+    </button>
+  </div>
+</div>

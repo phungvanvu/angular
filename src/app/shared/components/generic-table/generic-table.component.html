@@ -1,52 +1,135 @@
 <div class="main-content">
-    <h2>{{ title }}</h2>
-  <!-- Nút Create nằm ngoài box -->
-  <div class="page-header">
-    <button class="btn-create">Create {{ title.slice(0, -1) }}</button>
+  <h2>{{ title }}</h2>
+
+  <!-- Header -->
+  <div class="page-header" *ngIf="showCreateButton">
+    <button class="btn-create" (click)="create.emit()">
+      <!-- Thêm (click) để emit event -->
+      Create {{ title.slice(0, -1) }}
+    </button>
   </div>
-  <!-- Box bo góc -->
+
+  <!-- Table box -->
   <div class="table-box">
-    <!-- Thanh tìm kiếm -->
+    <!-- Toolbar -->
     <div class="table-toolbar">
-        <div class="search-wrapper">
-            <span class="material-icons search-icon">search</span>
-            <input type="text" placeholder="Search here..." />
-        </div>
+      <!-- Search -->
+      <div class="search-wrapper">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Search here..."
+          [(ngModel)]="keyword"
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+
+      <!-- Entries & Delete -->
+      <div class="entries-delete-wrapper">
+        <label>
+          Show
+          <select
+            class="entries-select"
+            [ngModel]="pagination?.size"
+            (ngModelChange)="onPageSizeChange($event)"
+          >
+            <option *ngFor="let opt of pageSizeOptions" [value]="opt">
+              {{ opt }}
+            </option>
+          </select>
+        </label>
+
+        <button
+          *ngIf="showDeleteButton"
+          type="button"
+          class="btn-icon-delete"
+          [disabled]="!selectedIds?.length"
+          (click)="deleteSelected.emit()"
+          title="Xóa mục đã chọn"
+        >
+          <span class="material-icons">delete</span>
+          <span class="delete-count">({{ selectedIds?.length || 0 }})</span>
+        </button>
+      </div>
     </div>
-    <!-- Bảng -->
+
+    <!-- Table -->
     <table>
       <thead>
         <tr>
-          <th><input type="checkbox" /></th>
+          <th>
+            <!-- Checkbox chọn tất cả -->
+            <input
+              type="checkbox"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll($event)"
+              (click)="$event.stopPropagation()"
+            />
+          </th>
           <th *ngFor="let col of columns">{{ col.header }}</th>
         </tr>
       </thead>
+
       <tbody>
-        <tr *ngFor="let item of data">
-          <td><input type="checkbox" /></td>
+        <tr *ngIf="!loading && data.length === 0">
+          <td [attr.colspan]="columns.length + 1" class="no-data-row">
+            Không có dữ liệu.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let item of data"
+          (click)="onRowClick(item)"
+          class="table-row-clickable"
+        >
+          <td>
+            <input
+              type="checkbox"
+              [checked]="isRowSelected(item.id)"
+              (change)="onRowCheckboxChange(item.id, $event)"
+              (click)="$event.stopPropagation()"
+            />
+          </td>
+
           <td *ngFor="let col of columns">
-            <ng-container *ngIf="templates && templates[col.field]; else default">
-              <ng-container *ngTemplateOutlet="templates[col.field]; context: {$implicit: item[col.field], $row: item}"></ng-container>
+            <ng-container
+              *ngIf="templates && templates[col.field]; else default"
+            >
+              <ng-container
+                *ngTemplateOutlet="
+                  templates[col.field];
+                  context: { $implicit: item[col.field], $row: item }
+                "
+              ></ng-container>
             </ng-container>
+
             <ng-template #default>
               <ng-container [ngSwitch]="col.field">
-
                 <!-- Thumbnail -->
-                <img *ngSwitchCase="'thumbnail'" [src]="item[col.field]" class="thumb-img" />
+                <img
+                  *ngSwitchCase="'thumbnail'"
+                  [src]="item[col.field]"
+                  class="thumb-img"
+                />
 
-                <!-- Price + OldPrice -->
+                <!-- Price + Old Price -->
                 <ng-container *ngSwitchCase="'price'">
                   <span>{{ item[col.field] }}</span>
-                  <span *ngIf="item.oldPrice" class="old-price">{{ item.oldPrice }}</span>
+                  <span *ngIf="item.oldPrice" class="old-price">
+                    {{ item.oldPrice }}
+                  </span>
                 </ng-container>
 
-                <!-- Badge -->
-                <span *ngSwitchCase="'stock'" class="badge badge-stock">{{ item[col.field] }}</span>
-                <span *ngSwitchCase="'status'" class="badge badge-status">{{ item[col.field] }}</span>
+                <!-- Status Badges -->
+                <span *ngSwitchCase="'stock'" class="badge badge-stock">
+                  {{ item[col.field] }}
+                </span>
+                <span *ngSwitchCase="'status'" class="badge badge-status">
+                  {{ item[col.field] }}
+                </span>
 
-                <!-- Fallback default -->
+                <!-- Default -->
                 <span *ngSwitchDefault>{{ item[col.field] }}</span>
-
               </ng-container>
             </ng-template>
           </td>

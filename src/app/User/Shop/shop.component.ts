@@ -1,20 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { ShoppingcartComponent } from '../../ShoppingCart/shoppingcart.component';
+import { ApiService } from '../../core/api/api.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { CartService } from '../../ShoppingCart/cart.service';
+import { Router } from '@angular/router';
+import { debounceTime, Subject } from 'rxjs';
 
 export interface Product {
   id: number;
   name: string;
+  minPrice: number;
+  maxPrice: number;
+  variantName?: string;
+  variantId?: number;
+  quantity?: number;
   price: number;
-  originalPrice?: number;
   image: string;
-  rating: number;
-  reviews: number;
   badge?: string;
   badgeColor?: string;
-  createdAt: string;
+  updatedAt: string;
   categories: string[];
+  isActive: boolean;
+  inStock: boolean;
+  newFrom: string;
+  newTo: string;
 }
 
 export interface Category {
@@ -29,23 +41,23 @@ export interface Category {
   templateUrl: './shop.component.html',
   styleUrls: ['./shop.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, ShoppingcartComponent],
 })
 export class ShopComponent implements OnInit {
   viewMode: 'grid' | 'list' = 'grid';
-  sortBy: string = 'Latest';
+  sortBy: string = 'Default';
   itemsPerPage: number = 10;
   currentPage: number = 1;
-  priceRange: [number, number] = [2, 7499];
-  cartItems: number = 5;
+  priceRange: [number, number] = [0, 50000000];
+  searchKeyword: string = '';
+  cartItems: number = 0;
+  isCartOpen: boolean = false;
+  toastText: string = '';
+  toastVisible: boolean = false;
+  toastTimeout: ReturnType<typeof setTimeout> | null = null;
+  showLoginModal: boolean = false;
 
-  sortOptions = [
-    'Latest',
-    'Price: Low to High',
-    'Price: High to Low',
-    'Most Popular',
-    'Best Rating',
-  ];
+  sortOptions = ['Default', 'Latest', 'Price Low to High', 'Price High to Low'];
   itemsPerPageOptions = [5, 10, 20, 30];
 
   categories: Category[] = [
@@ -73,228 +85,43 @@ export class ShopComponent implements OnInit {
     },
   ];
 
-  products: Product[] = [
-    {
-      id: 1,
-      name: 'Apple AirPods Pro',
-      price: 299.0,
-      image: '../../../assets/products/3115_acer_aspire_a514_56p_gray_a8.jpg',
-      rating: 4,
-      reviews: 15,
-      createdAt: '2024-07-01T10:00:00Z',
-      categories: ['electronics', 'consumer-electronics'],
-    },
-    {
-      id: 2,
-      name: 'Samsung Galaxy Watch 5',
-      price: 249.0,
-      image:
-        '../../../assets/products/90448_laptop_hp_14_ep0220tu_b73vwpa_0004_layer_2.jpgs',
-      rating: 4,
-      reviews: 12,
-      badge: '-10%',
-      badgeColor: 'success',
-      createdAt: '2024-06-25T12:00:00Z',
-      categories: ['electronics', 'watches'],
-    },
-    {
-      id: 3,
-      name: 'Dell Inspiron 15',
-      price: 599.0,
-      image:
-        '../../../assets/products/dell-pro-laptops-category-image-800x620.jpg',
-      rating: 3,
-      reviews: 7,
-      createdAt: '2024-06-20T15:00:00Z',
-      categories: ['electronics'],
-    },
-    {
-      id: 4,
-      name: 'Sony WH-1000XM4',
-      price: 349.0,
-      image: '../../../assets/products/images (1).jpg',
-      rating: 5,
-      reviews: 20,
-      createdAt: '2024-07-05T09:00:00Z',
-      categories: ['electronics'],
-    },
-    {
-      id: 5,
-      name: 'Fossil Gen 6 Smartwatch',
-      price: 299.0,
-      image: '../../../assets/products/images.jpg',
-      rating: 4,
-      reviews: 9,
-      createdAt: '2024-06-10T10:00:00Z',
-      categories: ['watches'],
-    },
-    {
-      id: 6,
-      name: '.ddddddpg',
-      price: 1199.0,
-      image: '../../../assets/products/tải xuống (1).jpg',
-      rating: 5,
-      reviews: 18,
-      createdAt: '2024-07-01T10:30:00Z',
-      categories: ['electronics'],
-    },
-    {
-      id: 7,
-      name: 'fgggggggggggggg',
-      price: 99.0,
-      image: '../../../assets/products/tải xuống (2).jpg',
-      rating: 4,
-      reviews: 10,
-      createdAt: '2024-07-03T11:00:00Z',
-      categories: ['electronics'],
-    },
-    {
-      id: 8,
-      name: 'Anker PowerCore 10000',
-      price: 49.0,
-      image: '../../../assets/products/tải xuống (3).jpg',
-      rating: 3,
-      reviews: 4,
-      createdAt: '2024-06-18T13:00:00Z',
-      categories: ['electronics'],
-    },
-    {
-      id: 9,
-      name: 'Men’s Leather Backpack',
-      price: 89.0,
-      image: '../../../assets/products/tải xuống.jpg',
-      rating: 4,
-      reviews: 6,
-      createdAt: '2024-07-02T14:00:00Z',
-      categories: ['backpacks', 'mens-fashion'],
-    },
-    {
-      id: 10,
-      name: 'Women’s Fashion Tote',
-      price: 79.0,
-      image: '../../../assets/products/images (1).jpg',
-      rating: 5,
-      reviews: 10,
-      createdAt: '2024-06-30T08:30:00Z',
-      categories: ['backpacks', 'womens-fashion'],
-    },
-    {
-      id: 11,
-      name: 'Xiaomi Smart Vacuum',
-      price: 249.0,
-      image: '../../../assets/products/images (2).jpg',
-      rating: 4,
-      reviews: 8,
-      createdAt: '2024-07-04T09:30:00Z',
-      categories: ['home-appliances'],
-    },
-    {
-      id: 12,
-      name: 'Dyson Supersonic Hair Dryer',
-      price: 399.0,
-      image: '../../../assets/products/images (3).jpg',
-      rating: 5,
-      reviews: 22,
-      createdAt: '2024-07-06T10:45:00Z',
-      categories: ['home-appliances'],
-    },
-    {
-      id: 13,
-      name: 'Casio Digital Watch',
-      price: 59.0,
-      image: '../../../assets/products/images (4).jpg',
-      rating: 3,
-      reviews: 5,
-      createdAt: '2024-06-26T11:20:00Z',
-      categories: ['watches'],
-    },
-    {
-      id: 14,
-      name: 'Samsung Smart Fridge',
-      price: 1799.0,
-      image: '../../../assets/products/tải xuống.jpg',
-      rating: 5,
-      reviews: 12,
-      createdAt: '2024-06-21T10:00:00Z',
-      categories: ['home-appliances'],
-    },
-    {
-      id: 15,
-      name: 'Men’s Business Shoes',
-      price: 129.0,
-      image:
-        '../../../assets/products/dell-pro-laptops-category-image-800x620.jpg',
-      rating: 4,
-      reviews: 11,
-      createdAt: '2024-06-28T09:15:00Z',
-      categories: ['mens-fashion'],
-    },
-    {
-      id: 16,
-      name: 'Women’s Heels',
-      price: 139.0,
-      image: '../../../assets/products/3115_acer_aspire_a514_56p_gray_a8.jpg',
-      rating: 4,
-      reviews: 14,
-      createdAt: '2024-07-01T08:40:00Z',
-      categories: ['womens-fashion'],
-    },
-    {
-      id: 17,
-      name: 'Smart LED TV 55"',
-      price: 699.0,
-      image: '../../../assets/products/images.jpg',
-      rating: 5,
-      reviews: 17,
-      createdAt: '2024-07-03T12:00:00Z',
-      categories: ['electronics', 'consumer-electronics'],
-    },
-    {
-      id: 18,
-      name: 'Canon EOS M50 Camera',
-      price: 649.0,
-      image:
-        '../../../assets/products/dell-pro-laptops-category-image-800x620.jpg',
-      rating: 5,
-      reviews: 13,
-      createdAt: '2024-06-29T14:10:00Z',
-      categories: ['electronics'],
-    },
-    {
-      id: 19,
-      name: 'TCL Air Conditioner',
-      price: 499.0,
-      image: '../../../assets/products/images (4).jpg',
-      rating: 4,
-      reviews: 7,
-      createdAt: '2024-06-15T15:00:00Z',
-      categories: ['home-appliances'],
-    },
-    {
-      id: 20,
-      name: 'JBL Bluetooth Speaker',
-      price: 129.0,
-      image: '../../../assets/products/3115_acer_aspire_a514_56p_gray_a8.jpg',
-      rating: 5,
-      reviews: 18,
-      createdAt: '2024-07-05T16:00:00Z',
-      categories: ['electronics'],
-    },
-  ];
+  filteredProducts: Product[] = [];
+  latestProducts: Product[] = [];
+  totalPages: number = 0;
+  totalElements: number = 0;
+  loading: boolean = true;
+  error: string = '';
 
-  filteredProductsAll: Product[] = []; // Danh sách đã lọc và sắp xếp
-  filteredProducts: Product[] = []; // Danh sách hiển thị sau phân trang
-  latestProducts: Product[] = []; // Danh sách sản phẩm mới nhất
-  constructor() {}
+  private searchSubject = new Subject<void>();
+
+  constructor(
+    private api: ApiService,
+    private auth: AuthService,
+    private cartService: CartService,
+    private router: Router,
+    private ngZone: NgZone,
+    private cd: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.applyFilters();
-    this.getLatestProducts();
+    this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.fetchProducts();
+    });
+
+    this.fetchProducts();
+
+    this.cartService.cart$.subscribe((cart) => {
+      this.cartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      this.cd.detectChanges();
+    });
   }
 
   toggleCategory(categoryId: string): void {
     const category = this.categories.find((c) => c.id === categoryId);
-    if (category) category.expanded = !category.expanded;
+    if (category) {
+      category.expanded = !category.expanded;
+      this.filterByCategory(categoryId);
+    }
   }
 
   setViewMode(mode: 'grid' | 'list'): void {
@@ -303,117 +130,437 @@ export class ShopComponent implements OnInit {
 
   onSortChange(event: any): void {
     this.sortBy = event.target.value || this.sortBy;
-    this.sortFilteredProducts();
-    this.paginateProducts();
+    this.currentPage = 1;
+    this.fetchProducts();
   }
 
   onItemsPerPageChange(event: any): void {
     this.itemsPerPage = parseInt(event.target.value, 10);
     this.currentPage = 1;
-    this.paginateProducts();
+    this.fetchProducts();
   }
 
   onPriceRangeChange(event: any): void {
     const value = parseInt(event.target.value);
-    this.priceRange = [this.priceRange[0], value];
-    this.applyFilters();
-  }
-
-  applyFilters(): void {
-    this.filteredProductsAll = this.products.filter(
-      (p) => p.price >= this.priceRange[0] && p.price <= this.priceRange[1]
-    );
-    this.sortFilteredProducts();
-    this.paginateProducts();
-  }
-
-  sortFilteredProducts(): void {
-    switch (this.sortBy) {
-      case 'Price: Low to High':
-        this.filteredProductsAll.sort((a, b) => a.price - b.price);
-        break;
-      case 'Price: High to Low':
-        this.filteredProductsAll.sort((a, b) => b.price - a.price);
-        break;
-      case 'Best Rating':
-        this.filteredProductsAll.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'Most Popular':
-        this.filteredProductsAll.sort((a, b) => b.reviews - a.reviews);
-        break;
-      case 'Latest':
-      default:
-        this.filteredProductsAll.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        break;
+    if (event.target.type === 'range') {
+      this.priceRange[1] = value;
+    } else if (
+      event.target ===
+      event.target.ownerDocument.querySelector('.price-input:first-child')
+    ) {
+      this.priceRange[0] = value >= 0 ? value : 0;
+    } else {
+      this.priceRange[1] =
+        value >= this.priceRange[0] ? value : this.priceRange[0];
     }
+    this.currentPage = 1;
+    this.ngZone.run(() => {
+      this.searchSubject.next();
+    });
   }
 
-  paginateProducts(): void {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.filteredProducts = this.filteredProductsAll.slice(start, end);
+  onSearchInput(event: any): void {
+    this.searchKeyword = event.target.value || '';
+    this.currentPage = 1;
+    this.ngZone.run(() => {
+      this.searchSubject.next();
+    });
+  }
+
+  fetchProducts(): void {
+    this.loading = true;
+    this.error = '';
+
+    const params: any = {
+      page: this.currentPage - 1,
+      size: this.itemsPerPage,
+      minPrice: this.priceRange[0],
+      maxPrice: this.priceRange[1],
+      isActive: true,
+      inStock: true,
+    };
+
+    if (this.searchKeyword) {
+      params.keyword = this.searchKeyword;
+    }
+
+    if (this.sortBy !== 'Default') {
+      params.sort = this.getSortField();
+    }
+
+    this.api
+      .get('/products/search', { params, headers: { 'skip-auth': 'true' } })
+      .subscribe({
+        next: (res: any) => {
+          const pageResult = res?.result;
+          const rawProducts = pageResult?.content ?? [];
+
+          this.filteredProducts = rawProducts.map((product: any) => {
+            let updatedAt = '';
+            if (product.updatedAt) {
+              const date = new Date(product.updatedAt);
+              if (!isNaN(date.getTime())) {
+                updatedAt = date.toISOString();
+              } else {
+                console.warn(
+                  `Invalid updatedAt value for product ${product.id}:`,
+                  product.updatedAt
+                );
+              }
+            }
+
+            const firstVariant =
+              product.variants && product.variants.length > 0
+                ? product.variants[0]
+                : {};
+            const variantName = firstVariant.name || '';
+            const variantId = firstVariant.id || null;
+            const price = firstVariant.sellingPrice || product.minPrice || 0;
+
+            const currentDate = new Date();
+            const newFrom = product.newFrom ? new Date(product.newFrom) : null;
+            const newTo = product.newTo ? new Date(product.newTo) : null;
+            let badge = product.inStock === false ? 'Out of Stock' : undefined;
+            let badgeColor = product.inStock === false ? 'danger' : 'success';
+            if (
+              !badge &&
+              newFrom &&
+              newTo &&
+              !isNaN(newFrom.getTime()) &&
+              !isNaN(newTo.getTime()) &&
+              currentDate >= newFrom &&
+              currentDate <= newTo
+            ) {
+              badge = 'New';
+              badgeColor = 'success';
+            }
+
+            return {
+              id: product.id || 0,
+              name: product.name || 'Unknown Product',
+              minPrice: product.minPrice || 0,
+              maxPrice: product.maxPrice || product.minPrice || 0,
+              variantName,
+              variantId,
+              variantType: firstVariant.type,
+              variants: product.variants,
+              price,
+              image: product.thumbnail
+                ? `http://localhost:8080/elec/${product.thumbnail.replace(
+                    /\\/g,
+                    '/'
+                  )}`
+                : 'assets/placeholder.jpg',
+              badge,
+              badgeColor,
+              updatedAt,
+              categories: product.categories || [],
+              isActive: product.isActive ?? true,
+              inStock: product.inStock ?? true,
+              newFrom: product.newFrom || '',
+              newTo: product.newTo || '',
+            };
+          });
+
+          const currentDate = new Date();
+          this.latestProducts = [...this.filteredProducts]
+            .filter((p) => {
+              const newFrom = p.newFrom ? new Date(p.newFrom) : null;
+              const newTo = p.newTo ? new Date(p.newTo) : null;
+              return (
+                newFrom &&
+                newTo &&
+                !isNaN(newFrom.getTime()) &&
+                !isNaN(newTo.getTime()) &&
+                currentDate >= newFrom &&
+                currentDate <= newTo
+              );
+            })
+            .sort(
+              (a, b) =>
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime()
+            )
+            .slice(0, 5);
+
+          this.totalPages = pageResult?.totalPages ?? 0;
+          this.totalElements = pageResult?.totalElements ?? 0;
+          this.loading = false;
+          this.cd.detectChanges();
+        },
+        error: (err) => {
+          console.error('API error:', err);
+          this.error = 'Không thể tải dữ liệu sản phẩm.';
+          this.loading = false;
+          this.filteredProducts = [];
+          this.latestProducts = [];
+          this.totalPages = 0;
+          this.totalElements = 0;
+          this.showToast('Lỗi khi tải sản phẩm. Vui lòng thử lại.');
+          this.cd.detectChanges();
+        },
+      });
+  }
+
+  getSortField(): string {
+    switch (this.sortBy) {
+      case 'Latest':
+        return 'updatedAt,desc';
+      case 'Price Low to High':
+        return 'minPrice,asc';
+      case 'Price High to Low':
+        return 'minPrice,desc';
+      default:
+        return '';
+    }
   }
 
   goToPage(page: number): void {
     this.currentPage = page;
-    this.paginateProducts();
+    this.fetchProducts();
   }
 
   nextPage(): void {
-    if (
-      this.currentPage * this.itemsPerPage <
-      this.filteredProductsAll.length
-    ) {
+    if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.paginateProducts();
+      this.fetchProducts();
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.paginateProducts();
+      this.fetchProducts();
     }
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.filteredProductsAll.length / this.itemsPerPage);
+  async addToCart(product: Product): Promise<void> {
+    if (product.inStock === false) {
+      this.showToast(`${product.name} hiện đã hết hàng`);
+      return;
+    }
+    if (!product.quantity || product.quantity < 1) {
+      product.quantity = 1;
+    }
+    const accessToken = this.auth.getAccessToken();
+    if (!accessToken) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    let isValid = await this.auth.isAccessTokenValid();
+    if (!isValid) {
+      const refreshed = await this.auth.refreshToken();
+      if (!refreshed) {
+        this.auth.logout();
+        return;
+      }
+      isValid = await this.auth.isAccessTokenValid();
+      if (!isValid) {
+        this.showToast('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        this.auth.logout();
+        return;
+      }
+    }
+    try {
+      await this.cartService.addToCart(product);
+      const productName = product.variantName
+        ? `${product.name} ${product.variantName}`
+        : product.name;
+      this.showToast(`${productName} đã được thêm vào giỏ hàng`);
+    } catch (err: any) {
+      console.error('Cart API error:', err);
+      if (
+        err.status === 401 ||
+        err.error?.message === 'Không tìm thấy người dùng.'
+      ) {
+        this.auth.logout();
+      } else {
+        this.showToast('Lỗi khi thêm sản phẩm vào giỏ hàng');
+      }
+    }
+    this.cd.detectChanges();
   }
 
-  getLatestProducts(): void {
-    this.latestProducts = [...this.products]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-      .slice(0, 5);
+  confirmLogin(): void {
+    this.showLoginModal = false;
+    this.router.navigate(['/login']);
+    this.cd.detectChanges();
   }
 
-  addToCart(product: Product): void {
-    this.cartItems++;
-    console.log('Added to cart:', product.name);
+  cancelLogin(): void {
+    this.showLoginModal = false;
+    this.cd.detectChanges();
+  }
+
+  showToast(message: string): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+      this.toastTimeout = null;
+      this.toastVisible = false;
+    }
+    this.ngZone.run(() => {
+      this.toastText = message;
+      this.toastVisible = true;
+      this.cd.detectChanges();
+      this.toastTimeout = setTimeout(() => {
+        this.toastVisible = false;
+        this.toastTimeout = null;
+        this.cd.detectChanges();
+      }, 3000);
+    });
   }
 
   addToWishlist(product: Product): void {
-    console.log('Added to wishlist:', product.name);
-  }
-
-  generateStars(rating: number): boolean[] {
-    return Array(5)
-      .fill(false)
-      .map((_, i) => i < rating);
+    const productName = product.variantName
+      ? `${product.name} ${product.variantName}`
+      : product.name;
+    console.log('Added to wishlist:', productName);
+    this.showToast(`${productName} đã được thêm vào danh sách yêu thích`);
   }
 
   filterByCategory(categoryId: string): void {
-    this.filteredProductsAll = this.products
-      .filter((p) => p.categories.includes(categoryId))
-      .filter(
-        (p) => p.price >= this.priceRange[0] && p.price <= this.priceRange[1]
-      );
-    this.sortFilteredProducts();
-    this.paginateProducts();
+    const params: any = {
+      page: this.currentPage - 1,
+      size: this.itemsPerPage,
+      minPrice: this.priceRange[0],
+      maxPrice: this.priceRange[1],
+      isActive: true,
+      inStock: true,
+    };
+
+    if (this.searchKeyword) {
+      params.keyword = this.searchKeyword;
+    }
+
+    if (this.sortBy !== 'Default') {
+      params.sort = this.getSortField();
+    }
+
+    this.api
+      .get('/products/search', { params, headers: { 'skip-auth': 'true' } })
+      .subscribe({
+        next: (res: any) => {
+          const pageResult = res?.result;
+          const rawProducts = pageResult?.content ?? [];
+
+          this.filteredProducts = rawProducts
+            .filter(
+              (p: any) => p.categories && p.categories.includes(categoryId)
+            )
+            .map((product: any) => {
+              let updatedAt = '';
+              if (product.updatedAt) {
+                const date = new Date(product.updatedAt);
+                if (!isNaN(date.getTime())) {
+                  updatedAt = date.toISOString();
+                } else {
+                  console.warn(
+                    `Invalid updatedAt value for product ${product.id}:`,
+                    product.updatedAt
+                  );
+                }
+              }
+
+              const firstVariant =
+                product.variants && product.variants.length > 0
+                  ? product.variants[0]
+                  : {};
+              const variantName = firstVariant.name || '';
+              const variantId = firstVariant.id || null;
+              const price = firstVariant.sellingPrice || product.minPrice || 0;
+
+              const currentDate = new Date();
+              const newFrom = product.newFrom
+                ? new Date(product.newFrom)
+                : null;
+              const newTo = product.newTo ? new Date(product.newTo) : null;
+              let badge =
+                product.inStock === false ? 'Out of Stock' : undefined;
+              let badgeColor = product.inStock === false ? 'danger' : 'success';
+              if (
+                !badge &&
+                newFrom &&
+                newTo &&
+                !isNaN(newFrom.getTime()) &&
+                !isNaN(newTo.getTime()) &&
+                currentDate >= newFrom &&
+                currentDate <= newTo
+              ) {
+                badge = 'New';
+                badgeColor = 'success';
+              }
+
+              return {
+                id: product.id || 0,
+                name: product.name || 'Unknown Product',
+                minPrice: product.minPrice || 0,
+                maxPrice: product.maxPrice || product.minPrice || 0,
+                variantName,
+                variantId,
+                price,
+                image: product.thumbnail
+                  ? `http://localhost:8080/elec/${product.thumbnail.replace(
+                      /\\/g,
+                      '/'
+                    )}`
+                  : 'assets/placeholder.jpg',
+                badge,
+                badgeColor,
+                updatedAt,
+                categories: product.categories || [],
+                isActive: product.isActive ?? true,
+                inStock: product.inStock ?? true,
+                newFrom: product.newFrom || '',
+                newTo: product.newTo || '',
+              };
+            });
+
+          const currentDate = new Date();
+          this.latestProducts = [...this.filteredProducts]
+            .filter((p) => {
+              const newFrom = p.newFrom ? new Date(p.newFrom) : null;
+              const newTo = p.newTo ? new Date(p.newTo) : null;
+              return (
+                newFrom &&
+                newTo &&
+                !isNaN(newFrom.getTime()) &&
+                !isNaN(newTo.getTime()) &&
+                currentDate >= newFrom &&
+                currentDate <= newTo
+              );
+            })
+            .sort(
+              (a, b) =>
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime()
+            )
+            .slice(0, 5);
+
+          this.totalPages = pageResult?.totalPages ?? 0;
+          this.totalElements = pageResult?.totalElements ?? 0;
+          this.cd.detectChanges();
+        },
+        error: (err) => {
+          console.error('API error:', err);
+          this.showToast('Lỗi khi lọc theo danh mục. Vui lòng thử lại.');
+          this.filteredProducts = [];
+          this.latestProducts = [];
+          this.totalPages = 0;
+          this.totalElements = 0;
+          this.cd.detectChanges();
+        },
+      });
+  }
+
+  closeCart(): void {
+    this.isCartOpen = false;
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    for (let i = 1; i <= this.totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
 }

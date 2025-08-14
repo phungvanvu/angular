@@ -1,0 +1,79 @@
+<!-- Overlay -->
+<div class="overlay" *ngIf="isCartOpen"></div>
+
+<!-- Sidebar giỏ hàng -->
+<aside
+  class="cart-sidebar"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cart-title"
+  *ngIf="isCartOpen"
+>
+  <header class="cart-header">
+    <h2 id="cart-title">
+      Giỏ hàng
+      <span class="badge">{{ cart.length }}</span>
+    </h2>
+    <button type="button" class="btn-close-custom" (click)="closeCart()">
+      <i class="material-icons">close</i>
+    </button>
+  </header>
+
+  <div class="toast-message" *ngIf="toastVisible">
+    <span class="material-icons toast-icon">check_circle</span>
+    <span class="toast-text">{{ toastText }}</span>
+    <div class="toast-progress"></div>
+  </div>
+
+  <div class="cart-body">
+    <div *ngIf="loading" class="loading">Đang tải giỏ hàng...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="!loading && cart.length === 0" class="empty-cart">
+      <p>Giỏ hàng của bạn đang trống.</p>
+    </div>
+    <div *ngIf="!loading && cart.length > 0">
+      <div *ngFor="let item of cart" class="cart-item">
+        <img [src]="item.product.image" [alt]="item.product.name" />
+        <div class="cart-item-details">
+          <div class="cart-item-header">
+            <h3>{{ item.product.name }}</h3>
+            <button class="cart-remove-btn" (click)="removeItem(item)">
+              <i class="material-icons">close</i>
+            </button>
+          </div>
+          <p *ngIf="item.product.variantName">
+            Biến thể: {{ item.product.variantName }}
+          </p>
+          <div class="cart-qty-controls">
+            <button (click)="decreaseQty(item)" [disabled]="item.quantity <= 1">
+              <i class="material-icons">remove</i>
+            </button>
+            <span class="qty">{{ item.quantity }}</span>
+            <button (click)="increaseQty(item)">
+              <i class="material-icons">add</i>
+            </button>
+            <span class="price"
+              >x {{ item.product.price.toLocaleString("vi-VN") }} ₫</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="cart-footer" *ngIf="cart.length > 0">
+    <div class="subtotal">
+      <span>Tổng cộng</span>
+      <span class="amount">{{ subtotal.toLocaleString("vi-VN") }} ₫</span>
+    </div>
+    <div class="btn-group">
+      <button type="button" class="btn btn-clear" (click)="clearCart()">
+        Xóa toàn bộ
+      </button>
+      <button type="button" class="btn btn-view">Xem giỏ hàng</button>
+      <button type="button" class="btn btn-checkout" (click)="goToCheckout()">
+        Thanh toán
+      </button>
+    </div>
+  </footer>
+</aside>

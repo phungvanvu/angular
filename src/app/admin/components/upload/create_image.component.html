@@ -3,56 +3,69 @@
     <!-- HEADER -->
     <div class="modal-header">
       <h2>File Manager</h2>
-      <button class="close-btn">&times;</button>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
     </div>
 
     <!-- CONTENT SCROLLABLE -->
     <div class="modal-body">
       <div class="content-box">
         <!-- DROP ZONE -->
-        <div class="drop-zone">
+        <div
+          class="drop-zone"
+          (dragover)="onDragOver($event)"
+          (dragenter)="onDragEnter($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+          [class.drag-over]="isDragOver"
+        >
           Drop files here or click to upload
+          <input
+            type="file"
+            multiple
+            style="display: none"
+            #fileInput
+            (change)="onFileSelect($event)"
+          />
         </div>
 
-        <!-- TOOLBAR -->
-        <div class="toolbar">
-          <div class="left">
-            Show 
-            <select>
-              <option>20</option>
-              <option>50</option>
-            </select>
-            entries
-            <button class="btn-delete">Delete</button>
-          </div>
-          <div class="right">
-            <input type="text" placeholder="Search here..." />
-          </div>
-        </div>
+        <!-- ERROR MESSAGE -->
+        <div *ngIf="error" class="error-message">{{ error }}</div>
 
         <!-- TABLE -->
-        <table class="file-table">
-          <thead>
-            <tr>
-              <th><input type="checkbox" /></th>
-              <th>ID</th>
-              <th>Thumbnail</th>
-              <th>Filename</th>
-              <th>Created</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let file of files">
-              <td><input type="checkbox" /></td>
-              <td>{{ file.id }}</td>
-              <td><img [src]="file.thumbnail" alt="thumb" /></td>
-              <td>{{ file.name }}</td>
-              <td>{{ file.created }}</td>
-              <td><button class="btn-insert">Insert</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <app-generic-table
+          [title]="'Files'"
+          [columns]="fileColumns"
+          [data]="files"
+          [templates]="templates"
+          [selectedIds]="selectedFileIds"
+          (selectedIdsChange)="selectedFileIds = $event"
+          [loading]="loading"
+          [keyword]="keyword"
+          (keywordChange)="keyword = $event"
+          [pagination]="{
+            page: page,
+            size: size,
+            totalItems: totalItems,
+            onPageChange: onPageChange.bind(this)
+          }"
+          [showDeleteButton]="true"
+          [showCreateButton]="false"
+          (deleteSelected)="deleteSelectedFiles()"
+          (pageSizeChange)="onPageSizeChange($event)"
+          [pageSizeOptions]="[20, 50]"
+        >
+          <!-- Custom template for the Insert button -->
+          <ng-template #action let-row="$row">
+            <button
+              *ngIf="isEntityLinkingMode"
+              class="btn-insert"
+              (click)="linkOrSelectFile(row)"
+            >
+              Insert
+            </button>
+          </ng-template>
+        </app-generic-table>
       </div>
     </div>
   </div>

@@ -1,5 +1,25 @@
-<app-generic-table
-  [title]="'Variations'"
-  [columns]="productColumns"
-  [data]="products">
-</app-generic-table>
+<div class="variations-wrapper">
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <!-- Variations Table -->
+  <app-generic-table
+    [title]="'Variations'"
+    [columns]="variationColumns"
+    [data]="variations"
+    [selectedIds]="selectedVariationIds"
+    (selectedIdsChange)="selectedVariationIds = $event"
+    [loading]="loading"
+    [keyword]="keyword"
+    (keywordChange)="keyword = $event; searchVariations()"
+    [pagination]="{
+      page: page,
+      size: size,
+      totalItems: totalItems,
+      onPageChange: onPageChange.bind(this)
+    }"
+    [showDeleteButton]="true"
+    (deleteSelected)="deleteSelectedVariations()"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (create)="onCreate()"
+    (rowClick)="onVariationRowClick($event)"
+  />
+</div>

@@ -35,16 +35,16 @@
   </header>
 
   <!-- Product Detail Content -->
-  <div class="product-container">
+  <div class="product-container" *ngIf="apiProduct">
     <div class="product-content">
       <!-- Product Images -->
       <div class="product-images">
         <div class="main-image">
-          <img [src]="product.images[selectedImage]" [alt]="product.name" />
+          <img [src]="images[selectedImage]" [alt]="product.name" />
         </div>
         <div class="thumbnail-images">
           <div
-            *ngFor="let image of product.images; let i = index"
+            *ngFor="let image of images; let i = index"
             class="thumbnail"
             [class.active]="selectedImage === i"
             (click)="selectImage(i)"
@@ -59,7 +59,7 @@
         <h1 class="product-title">{{ product.name }}</h1>
 
         <!-- Rating -->
-        <div class="rating-section">
+        <!-- <div class="rating-section">
           <div class="stars">
             <span
               *ngFor="let star of getStars(product.rating)"
@@ -70,7 +70,7 @@
             </span>
           </div>
           <span class="review-count">{{ product.reviews }} Reviews</span>
-        </div>
+        </div> -->
 
         <!-- Stock Status -->
         <div class="stock-status" *ngIf="product.inStock">
@@ -78,26 +78,30 @@
         </div>
 
         <!-- Description -->
-        <div class="product-description">
-          <p>{{ product.description }}</p>
+        <!-- <div class="product-description">
+          <p>{{ product.shortDescription }}</p>
           <p class="warranty">{{ product.warranty }}</p>
-        </div>
+        </div> -->
 
         <!-- Price -->
         <div class="price-section">
-          <span class="price">${{ product.price }}</span>
+          <span class="original-price" *ngIf="product.originalPrice">
+            {{ formatPrice(product.originalPrice) }} đ
+          </span>
+          <span class="price"> {{ formatPrice(product.price) }} đ </span>
         </div>
 
         <!-- Quantity and Add to Cart -->
         <div class="purchase-section">
           <div class="quantity-selector">
-            <label>Quantity:</label>
+            <label>Số lượng:</label>
             <div class="quantity-controls">
               <button (click)="changeQuantity(-1)" class="qty-btn">-</button>
               <input
                 type="number"
                 [(ngModel)]="quantity"
                 min="1"
+                [max]="maxQuantity"
                 class="qty-input"
               />
               <button (click)="changeQuantity(1)" class="qty-btn">+</button>
@@ -106,11 +110,27 @@
           <button class="add-to-cart-btn" (click)="addToCart()">Add</button>
         </div>
 
+        <!-- Variant Selection -->
+        <div class="variant-section" *ngIf="variants.length > 0">
+          <label>{{ variantLabel }}:</label>
+          <select
+            [(ngModel)]="selectedVariant"
+            (ngModelChange)="updateDisplayFromVariant()"
+          >
+            <option *ngFor="let variant of variants" [ngValue]="variant">
+              {{ variant.name }}
+            </option>
+          </select>
+        </div>
+
         <!-- Product Details -->
         <div class="product-details">
-          <div class="detail-item"><strong>SKU:</strong> {{ product.id }}</div>
+          <div class="detail-item"><strong>SKU:</strong> {{ product.sku }}</div>
           <div class="detail-item">
-            <strong>Categories:</strong> {{ product.category }}
+            <strong>Danh mục:</strong> {{ product.category }}
+          </div>
+          <div class="detail-item">
+            <strong>Thương hiệu:</strong> {{ product.brand }}
           </div>
           <div class="detail-item">
             <strong>Tags:</strong>
@@ -122,19 +142,18 @@
 
         <!-- Social Share -->
         <div class="social-share">
-          <span>Share:</span>
+          <span class="share-label">Share:</span>
           <button (click)="shareProduct('facebook')" class="share-btn facebook">
-            f
+            <i class="fab fa-facebook-f"></i>
           </button>
           <button (click)="shareProduct('twitter')" class="share-btn twitter">
-            t
+            <i class="fab fa-twitter"></i>
           </button>
-          <button
-            (click)="shareProduct('email')"
-            class="share-btn email"
-          ></button>
+          <button (click)="shareProduct('email')" class="share-btn email">
+            <i class="fas fa-envelope"></i>
+          </button>
           <button (click)="shareProduct('link')" class="share-btn link">
-            🔗
+            <i class="fas fa-link"></i>
           </button>
         </div>
       </div>
@@ -175,21 +194,21 @@
           [class.active]="activeTab === 'description'"
           (click)="setActiveTab('description')"
         >
-          Description
+          Mô Tả
         </button>
         <button
           class="tab-btn"
           [class.active]="activeTab === 'specification'"
           (click)="setActiveTab('specification')"
         >
-          Specification
+          Đặc điểm kỹ thuật
         </button>
         <button
           class="tab-btn"
           [class.active]="activeTab === 'reviews'"
           (click)="setActiveTab('reviews')"
         >
-          Reviews ({{ product.reviews }})
+          Đánh giá ({{ product.reviews }})
         </button>
       </div>
 
@@ -197,60 +216,18 @@
         <div *ngIf="activeTab === 'description'" class="tab-panel">
           <h3>{{ product.name }}</h3>
           <p>{{ product.description }}</p>
-
-          <!-- Size Chart -->
-          <div class="size-chart-section">
-            <h4>SIZE CHART</h4>
-            <p>
-              <em
-                >Size information: unit cm (hand measured, actual size may have
-                discrepancy about 1-3cm)</em
-              >
-            </p>
-
-            <div class="size-chart-toggle">
-              <button (click)="toggleSizeChart()" class="show-more-btn">
-                {{ showSizeChart ? "Show Less" : "Show More" }}
-              </button>
-            </div>
-
-            <table class="size-chart-table" *ngIf="showSizeChart">
-              <thead>
-                <tr>
-                  <th>US SIZE</th>
-                  <th>SHOULDER</th>
-                  <th>CHEST</th>
-                  <th>LENGTH</th>
-                  <th>SLEEVE</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let size of sizeChart">
-                  <td>{{ size.size }}</td>
-                  <td>{{ size.shoulder }}</td>
-                  <td>{{ size.chest }}</td>
-                  <td>{{ size.length }}</td>
-                  <td>{{ size.sleeve }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
 
         <div *ngIf="activeTab === 'specification'" class="tab-panel">
-          <h3>Specification</h3>
+          <h3>Đặc điểm kỹ thuật</h3>
           <ul>
-            <li><strong>Brand:</strong> GuaGuanTa</li>
-            <li><strong>Sleeve Length:</strong> Short</li>
-            <li><strong>Shirt Type:</strong> Slim Style</li>
-            <li><strong>Style:</strong> Casual</li>
-            <li><strong>Decoration:</strong> Embroidery</li>
-            <li><strong>Material:</strong> Cotton blend</li>
+            <li><strong>Thương Hiệu:</strong> {{ product.brand }}</li>
+            <li><strong>Mô Tả:</strong> {{ product.description }}</li>
           </ul>
         </div>
 
         <div *ngIf="activeTab === 'reviews'" class="tab-panel">
-          <h3>Customer Reviews</h3>
+          <h3>Đánh giá của khách hàng</h3>
           <div class="review-summary">
             <div class="rating-overview">
               <div class="stars">
@@ -266,14 +243,13 @@
               >
             </div>
           </div>
-          <p>No reviews yet. Be the first to review this product!</p>
         </div>
       </div>
     </div>
 
     <!-- Related Products -->
     <div class="related-products">
-      <h3>You might also like</h3>
+      <h3>Bạn có thể sẽ thích:</h3>
       <div class="related-grid">
         <div class="related-item" *ngFor="let item of relatedProducts">
           <img [src]="item.image" [alt]="item.name" />
@@ -283,9 +259,12 @@
               >★</span
             >
           </div>
-          <div class="item-price">${{ item.price }}</div>
+          <div class="item-price">{{ item.price }}đ</div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" *ngIf="toastVisible">{{ toastText }}</div>
 </div>

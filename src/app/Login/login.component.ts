@@ -27,6 +27,9 @@ export class LoginComponent {
   ) {}
 
   signIn(form: any) {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+
     this.resetErrors();
 
     this.api
@@ -38,7 +41,7 @@ export class LoginComponent {
         next: (res: any) => {
           const { accessToken, refreshToken } = res.result;
           localStorage.setItem('accessToken', accessToken);
-          this.authService.setRefreshToken(refreshToken);
+          this.authService.saveRefreshToken(refreshToken);
 
           const payload = JSON.parse(atob(accessToken.split('.')[1]));
           const role = payload.scope;
@@ -46,7 +49,7 @@ export class LoginComponent {
           if (role.includes('ROLE_ADMIN')) {
             this.router.navigate(['/app-layout/dashboard']);
           } else if (role.includes('ROLE_USER')) {
-            this.router.navigate(['/home']);
+            this.router.navigate(['/shop']);
           } else {
             this.error = 'Không xác định vai trò!';
           }

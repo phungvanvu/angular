@@ -4,14 +4,23 @@
 
   <!-- Box tổng (bo góc) -->
   <div class="brand-box">
-    
     <!-- Sidebar: Brand Information được bọc box riêng -->
     <div class="brand-sidebar-box">
-        <h3 class="sidebar-header">Brand Information</h3>
-        <ul>
-            <li [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">General</li>
-            <li [class.active]="activeTab === 'images'" (click)="activeTab = 'images'">Images</li>
-        </ul>
+      <h3 class="sidebar-header">Brand Information</h3>
+      <ul>
+        <li
+          [class.active]="activeTab === 'general'"
+          (click)="changeTab('general')"
+        >
+          General
+        </li>
+        <li
+          [class.active]="activeTab === 'images'"
+          (click)="changeTab('images')"
+        >
+          Images
+        </li>
+      </ul>
     </div>
 
     <!-- Nội dung bên phải -->
@@ -27,39 +36,64 @@
           </div>
 
           <div class="form-group">
-            <label><input type="checkbox" formControlName="status" /> Enable the brand</label>
+            <label
+              ><input type="checkbox" formControlName="status" /> Enable the
+              brand</label
+            >
           </div>
 
           <button type="submit" class="btn-save">Save</button>
         </form>
       </div>
 
-      <!-- Tabs khác -->
+      <!-- Images Tab -->
       <div *ngIf="activeTab === 'images'">
-            <h3>Images</h3>
-            <hr />
+        <h3>Images</h3>
+        <hr />
 
-            <div class="image-block">
-                <label>Logo</label>
-                <button type="button" class="btn-browse" (click)="handleBrowse()">
-                  <i class="fas fa-folder-open"></i> Browse
-                </button>
-                <div class="image-preview">
-                <i class="fas fa-image"></i>
-                </div>
-            </div>
+        <div class="image-block">
+          <label>Logo</label>
+          <button
+            type="button"
+            class="btn-browse"
+            (click)="openFileManager('logo')"
+          >
+            <i class="fas fa-folder-open"></i> Browse
+          </button>
+          <div class="image-preview">
+            <img *ngIf="logoPreview" [src]="logoPreview" alt="Logo Preview" />
+            <i *ngIf="!logoPreview" class="fas fa-image"></i>
+          </div>
+        </div>
 
-            <div class="image-block">
-                <label>Banner</label>
-                <button type="button" class="btn-browse" (click)="handleBrowse()">
-                  <i class="fas fa-folder-open"></i> Browse
-                </button>
-                <div class="image-preview">
-                <i class="fas fa-image"></i>
-                </div>
-            </div>
-
-            <button type="button" class="btn-save">Save</button>
-            </div>
+        <div class="image-block">
+          <label>Banner</label>
+          <button
+            type="button"
+            class="btn-browse"
+            (click)="openFileManager('banner')"
+          >
+            <i class="fas fa-folder-open"></i> Browse
+          </button>
+          <div class="image-preview">
+            <img
+              *ngIf="bannerPreview"
+              [src]="bannerPreview"
+              alt="Banner Preview"
+            />
+            <i *ngIf="!bannerPreview" class="fas fa-image"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- File Manager Modal -->
+  <create_image
+    *ngIf="showFileManager"
+    [entityId]="brandId"
+    [zone]="selectedZone"
+    (fileInserted)="onFileInserted($event)"
+    (close)="showFileManager = false"
+  ></create_image>
 </div>

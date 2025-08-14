@@ -1,691 +1,878 @@
-import { Component, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatCardModule } from '@angular/material/card';
+import { FormsModule } from '@angular/forms';
 
-//
-// ==========================
-// INTERFACE ĐỊNH NGHĨA DỮ LIỆU - CODE CŨ
-// ==========================
-//
-
-/**
- * Interface cho tùy chọn ngôn ngữ
- */
-interface Language {
-  code: string;
+interface Category {
+  id: string;
   name: string;
-  url?: string;
+  icon: string;
 }
 
-/**
- * Interface cho tùy chọn tiền tệ
- */
-interface Currency {
-  code: string;
-  name: string;
-  url?: string;
-}
-
-/**
- * Interface cho thông tin sản phẩm
- */
 interface Product {
-  id: number;
+  id: string | number;
   name: string;
-  description?: string;
+  image: string;
   price: number;
   originalPrice?: number;
   discount?: string;
-  image: string;
-  category: string;
-  rating?: number;
-  reviews?: number;
-  reviewCount?: number; // Thêm thuộc tính này cho phần showcase
-  status?: string;
+  rating: number;
+  reviewCount: number;
+  isOutOfStock?: boolean;
   isNew?: boolean;
-  isOutOfStock?: boolean; // Thêm thuộc tính này cho phần showcase
-  badge?: string;
+  category?: string;
 }
 
-/**
- * Interface cho danh mục sản phẩm
- */
-interface Category {
-  id: number;
-  name: string;
-  icon: string;
-  hasSubcategories?: boolean;
-  image?: string;
-  backgroundColor?: string;
-  isSelected?: boolean;
-  selected?: boolean;
-  isActive?: boolean; // Thêm thuộc tính này cho phần showcase
-}
-
-/**
- * Interface cho tính năng dịch vụ
- */
-interface ServiceFeature {
+interface Feature {
   icon: string;
   title: string;
   description: string;
-  color: string;
 }
 
-/**
- * Interface cho liên kết
- */
-interface LinkItem {
-  name: string;
-  url: string;
+interface BannerItem {
+  id: string;
+  title: string;
+  highlightText?: string;
+  description: string;
+  image: string;
+  backgroundColor: string;
+  textColor: string;
+  titleColor: string;
 }
-
-/**
- * Interface cho thẻ tag
- */
-interface Tag {
-  name: string;
-  icon: string;
-}
-
-/**
- * Interface cho liên kết mạng xã hội
- */
-interface SocialLink {
-  name: string;
-  icon: string;
-  url: string;
-}
-
-/**
- * Interface cho thông tin liên hệ
- */
-interface ContactInfo {
-  phone: string;
-  email: string;
-  address: string;
-}
-
-//
-// ==========================
-// COMPONENT CHÍNH - HOME (ĐÃ ĐƯỢC GỘP)
-// ==========================
-//
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    MatInputModule,
+    MatSelectModule,
+    MatBadgeModule,
+    MatCardModule,
+    FormsModule,
+  ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
+  title = 'dji-mavic';
+  accessToken: string | null = null;
 
-  //
-  // ==========================
-  // BIẾN TRẠNG THÁI CHO DROPDOWN - CODE CŨ
-  // ==========================
-  //
-
-  // Trạng thái mở/đóng dropdown ngôn ngữ
-  isLanguageOpen = false;
-  // Trạng thái mở/đóng dropdown tiền tệ
-  isCurrencyOpen = false;
-  // Ngôn ngữ được chọn hiện tại
-  selectedLanguage = 'English';
-  // Tiền tệ được chọn hiện tại
-  selectedCurrency = 'USD';
-
-  //
-  // ==========================
-  // DỮ LIỆU DROPDOWN - CODE CŨ
-  // ==========================
-  //
-
-  // Danh sách các ngôn ngữ có sẵn
-  languages: Language[] = [
-    { code: 'en', name: 'English', url: '/en' },
-    { code: 'ar', name: 'Arabic', url: '/ar' }
-  ];
-
-  // Danh sách các loại tiền tệ có sẵn
-  currencies: Currency[] = [
-    { code: 'USD', name: 'US Dollar', url: '/current-currency/USD' },
-    { code: 'BDT', name: 'Bangladeshi Taka', url: '/current-currency/BDT' },
-    { code: 'INR', name: 'Indian Rupee', url: '/current-currency/INR' },
-    { code: 'NGN', name: 'Nigerian Naira', url: '/current-currency/NGN' },
-    { code: 'SAR', name: 'Saudi Riyal', url: '/current-currency/SAR' },
-    { code: 'UYU', name: 'Uruguayan Peso', url: '/current-currency/UYU' }
-  ];
-
-  //
-  // ==========================
-  // DỮ LIỆU TRANG CHÍNH - CODE CŨ
-  // ==========================
-  //
-
-  // Danh sách categories chính cho sidebar
+  // Danh sách các danh mục sản phẩm hiển thị trong sidebar
   categories: Category[] = [
-    { id: 1, name: 'Consumer Electronics', icon: 'devices', hasSubcategories: true, backgroundColor: '#f8f9fa', isSelected: true },
-    { id: 2, name: 'Televisions', icon: 'tv', backgroundColor: '#ffffff' },
-    { id: 3, name: 'Watches', icon: 'watch', backgroundColor: '#ffffff' },
-    { id: 4, name: 'Fashion', icon: 'checkroom', hasSubcategories: true, backgroundColor: '#ffffff' },
-    { id: 5, name: 'Backpacks', icon: 'backpack', backgroundColor: '#ffffff' },
-    { id: 6, name: 'Tablets', icon: 'tablet', backgroundColor: '#ffffff' },
-    { id: 7, name: 'Headphones', icon: 'headphones', backgroundColor: '#ffffff' },
-    { id: 8, name: 'Hot Sale', icon: 'local_fire_department', backgroundColor: '#ffffff' },
-    { id: 9, name: 'Shoes', icon: 'footwear', backgroundColor: '#ffffff' },
-    { id: 10, name: 'All Categories', icon: 'category', backgroundColor: '#ffffff' }
+    { id: '1', name: 'Consumer Electronics', icon: 'devices' },
+    { id: '2', name: 'Television', icon: 'tv' },
+    { id: '3', name: 'Watches', icon: 'watch' },
+    { id: '4', name: 'Fashion', icon: 'checkroom' },
+    { id: '5', name: 'Backpacks', icon: 'backpack' },
+    { id: '6', name: 'Tablets', icon: 'tablet' },
+    { id: '7', name: 'Headphones', icon: 'headphones' },
+    { id: '8', name: 'Hot Sale', icon: 'local_fire_department' },
+    { id: '9', name: 'Shoe', icon: 'directions_run' },
+    { id: '10', name: 'All Categories', icon: 'category' },
   ];
 
-  // Danh sách sản phẩm nổi bật cho slider
-  featuredProducts: Product[] = [
+  // Danh sách các tính năng/dịch vụ của cửa hàng
+  features: Feature[] = [
+    {
+      icon: 'support_agent',
+      title: '24/7 SUPPORT',
+      description: 'Support every time',
+    },
+    {
+      icon: 'payment',
+      title: 'ACCEPT PAYMENT',
+      description: 'Visa, Paypal, Master',
+    },
+    {
+      icon: 'security',
+      title: 'SECURED PAYMENT',
+      description: '100% secured',
+    },
+    {
+      icon: 'local_shipping',
+      title: 'FREE SHIPPING',
+      description: 'Order over $100',
+    },
+    {
+      icon: 'keyboard_return',
+      title: '30 DAYS RETURN',
+      description: '30 days guarantee',
+    },
+  ];
+
+  // Danh mục đang được chọn trong product showcase section
+  activeCategory = 'laptops';
+
+  // Danh sách các danh mục hiển thị trong product showcase với hình ảnh
+  showcaseCategories: Category[] = [
+    {
+      id: 'laptops',
+      name: 'Laptops',
+      icon: 'https://asia.fleetcart.envaysoft.com/storage/media/2cZfkz85nXxlSTySz6R8m34u5UQLfiRQVyKjF8hm.png',
+    },
+    {
+      id: 'mobiles',
+      name: 'Mobiles',
+      icon: 'https://asia.fleetcart.envaysoft.com/storage/media/UAP07Ygha9iXNfG1Rh6DYWrwVQ3HfkuqetLaLc6M.jpeg',
+    },
+    {
+      id: 'tablets',
+      name: 'Tablets',
+      icon: 'https://asia.fleetcart.envaysoft.com/storage/media/dzeszBwEcUnjWoixHvGYJD7uD2j6BWsy7TBK7tcJ.jpeg',
+    },
+    {
+      id: 'watches',
+      name: 'Watches',
+      icon: 'https://asia.fleetcart.envaysoft.com/storage/media/0Ae4WkaGunLTgTDf24i2ui0hhGB2kZPRVS5k7rn8.jpeg',
+    },
+    {
+      id: 'fashion',
+      name: "Men's Fashion",
+      icon: 'https://asia.fleetcart.envaysoft.com/storage/media/4vy12UtugCqB76AoWvy0cAHlzKb1HZsklmkOQ6hK.jpeg',
+    },
+    {
+      id: 'televisions',
+      name: 'Televisions',
+      icon: 'https://asia.fleetcart.envaysoft.com/storage/media/sjBHD1SNqe4BgkqmvqmWAB7U759HOZPVJRvV1Qbr.png',
+    },
+  ];
+
+  allProducts: Product[] = [
+    // ===== LAPTOPS SECTION =====
+    {
+      id: '1',
+      name: 'MacBook Air M3 (13-inch, 256GB)',
+      image:
+        'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&h=300&fit=crop',
+      price: 1099.0,
+      originalPrice: 1199.0,
+      discount: '-8%',
+      rating: 4.7,
+      reviewCount: 1823,
+      category: 'laptops',
+      isNew: true,
+    },
+    {
+      id: '2',
+      name: 'MacBook Pro M3 Pro (14-inch, 512GB)',
+      image:
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop',
+      price: 1999.0,
+      rating: 4.8,
+      reviewCount: 1456,
+      category: 'laptops',
+    },
+    {
+      id: '3',
+      name: 'Dell XPS 13 Plus (Intel i7, 512GB SSD)',
+      image:
+        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=300&h=300&fit=crop',
+      price: 1299.0,
+      originalPrice: 1599.0,
+      discount: '-19%',
+      rating: 4.4,
+      reviewCount: 892,
+      category: 'laptops',
+    },
+    {
+      id: '4',
+      name: 'ASUS ROG Zephyrus G14 (AMD Ryzen 9, RTX 4060)',
+      image:
+        'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=300&h=300&fit=crop',
+      price: 1399.0,
+      rating: 4.5,
+      reviewCount: 734,
+      category: 'laptops',
+      isOutOfStock: true,
+    },
+    {
+      id: '5',
+      name: 'HP Spectre x360 (Intel i7, 1TB SSD)',
+      image:
+        'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=300&h=300&fit=crop',
+      price: 1199.0,
+      originalPrice: 1499.0,
+      discount: '-20%',
+      rating: 4.3,
+      reviewCount: 567,
+      category: 'laptops',
+    },
+    {
+      id: '6',
+      name: 'Lenovo ThinkPad X1 Carbon Gen 11',
+      image:
+        'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&h=300&fit=crop',
+      price: 1599.0,
+      rating: 4.6,
+      reviewCount: 445,
+      category: 'laptops',
+      isNew: true,
+    },
+    {
+      id: '7',
+      name: 'Microsoft Surface Laptop 5 (Intel i7, 256GB)',
+      image:
+        'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&h=300&fit=crop',
+      price: 999.0,
+      originalPrice: 1299.0,
+      discount: '-23%',
+      rating: 4.2,
+      reviewCount: 623,
+      category: 'laptops',
+    },
+    // ===== MOBILE PHONES SECTION =====
+    {
+      id: '8',
+      name: 'iPhone 15 Pro Max (256GB)',
+      image:
+        'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
+      price: 1199.0,
+      originalPrice: 1299.0,
+      discount: '-8%',
+      rating: 4.8,
+      reviewCount: 2340,
+      category: 'mobiles',
+      isNew: true,
+    },
+    {
+      id: '9',
+      name: 'Samsung Galaxy S24 Ultra (512GB)',
+      image:
+        'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=300&h=300&fit=crop',
+      price: 1099.99,
+      rating: 4.7,
+      reviewCount: 1890,
+      category: 'mobiles',
+    },
+    {
+      id: '10',
+      name: 'Google Pixel 8 Pro (128GB)',
+      image:
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop',
+      price: 699.0,
+      originalPrice: 899.0,
+      discount: '-22%',
+      rating: 4.5,
+      reviewCount: 1245,
+      category: 'mobiles',
+    },
+    {
+      id: '11',
+      name: 'OnePlus 12 (256GB)',
+      image:
+        'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=300&h=300&fit=crop',
+      price: 799.0,
+      rating: 4.4,
+      reviewCount: 876,
+      category: 'mobiles',
+      isOutOfStock: true,
+    },
+    {
+      id: '12',
+      name: 'Xiaomi 14 Pro (512GB)',
+      image:
+        'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=300&h=300&fit=crop',
+      price: 649.99,
+      originalPrice: 799.99,
+      discount: '-19%',
+      rating: 4.3,
+      reviewCount: 654,
+      category: 'mobiles',
+    },
+    {
+      id: '13',
+      name: 'iPhone 14 (128GB)',
+      image:
+        'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=300&h=300&fit=crop',
+      price: 599.0,
+      originalPrice: 799.0,
+      discount: '-25%',
+      rating: 4.6,
+      reviewCount: 3210,
+      category: 'mobiles',
+    },
+    {
+      id: '14',
+      name: 'Samsung Galaxy Z Fold 5 (256GB)',
+      image:
+        'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=300&h=300&fit=crop',
+      price: 1399.99,
+      originalPrice: 1799.99,
+      discount: '-22%',
+      rating: 4.2,
+      reviewCount: 567,
+      category: 'mobiles',
+      isNew: true,
+    },
+    // ===== HEADPHONES & AUDIO SECTION =====
+    {
+      id: '15',
+      name: 'Apple AirPods Pro (2nd Generation)',
+      image:
+        'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=300&h=300&fit=crop',
+      price: 249.0,
+      originalPrice: 279.0,
+      discount: '-11%',
+      rating: 4.5,
+      reviewCount: 1250,
+      category: 'headphones',
+      isNew: true,
+    },
+    {
+      id: '16',
+      name: 'Sony WH-1000XM5 Wireless Headphones',
+      image:
+        'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=300&h=300&fit=crop',
+      price: 349.99,
+      rating: 4.8,
+      reviewCount: 890,
+      category: 'headphones',
+    },
+    {
+      id: '17',
+      name: 'Bose QuietComfort Earbuds',
+      image:
+        'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop',
+      price: 199.0,
+      originalPrice: 279.0,
+      discount: '-29%',
+      rating: 4.3,
+      reviewCount: 567,
+      category: 'headphones',
+    },
+    {
+      id: '18',
+      name: 'Samsung Galaxy Buds2 Pro',
+      image:
+        'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=300&h=300&fit=crop',
+      price: 149.99,
+      rating: 4.2,
+      reviewCount: 423,
+      category: 'headphones',
+      isOutOfStock: true,
+    },
+    {
+      id: '19',
+      name: 'JBL Live 660NC Wireless Headphones',
+      image:
+        'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300&h=300&fit=crop',
+      price: 89.95,
+      originalPrice: 149.95,
+      discount: '-40%',
+      rating: 4.1,
+      reviewCount: 312,
+      category: 'headphones',
+    },
+    {
+      id: '20',
+      name: 'Audio-Technica ATH-M50xBT2',
+      image:
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop',
+      price: 179.0,
+      rating: 4.6,
+      reviewCount: 756,
+      category: 'headphones',
+    },
+    {
+      id: '21',
+      name: 'Sennheiser Momentum 4 Wireless',
+      image:
+        'https://images.unsplash.com/photo-1545127398-14699f92334b?w=300&h=300&fit=crop',
+      price: 299.95,
+      originalPrice: 379.95,
+      discount: '-21%',
+      rating: 4.7,
+      reviewCount: 445,
+      category: 'headphones',
+    },
+    // ===== WATCHES & WEARABLES SECTION =====
+    {
+      id: '22',
+      name: "Fanmis Men's Luxury Analog Quartz Gold Wrist Watches",
+      image:
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop',
+      price: 15.92,
+      originalPrice: 17.99,
+      rating: 4.0,
+      reviewCount: 125,
+      category: 'watches',
+    },
+    {
+      id: '23',
+      name: "Fossil Women's Gen 4 Venture HR Stainless Steel Touchscreen",
+      image:
+        'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=300&h=300&fit=crop',
+      price: 299.0,
+      rating: 4.2,
+      reviewCount: 234,
+      category: 'watches',
+    },
+    {
+      id: '24',
+      name: "Fossil Men's Sport Metal and Silicone Touchscreen",
+      image:
+        'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=300&h=300&fit=crop',
+      price: 99.0,
+      originalPrice: 275.0,
+      rating: 4.1,
+      reviewCount: 156,
+      category: 'watches',
+    },
+    {
+      id: '25',
+      name: 'Michael Kors Access Gen 3 Sofie Touchscreen Smartwatch',
+      image:
+        'https://images.unsplash.com/photo-1617043983671-adaadcaa2460?w=300&h=300&fit=crop',
+      price: 299.0,
+      rating: 4.3,
+      reviewCount: 189,
+      category: 'watches',
+    },
+    {
+      id: '26',
+      name: 'Apple Watch Series 5 (GPS, 40mm) - Gold Aluminum',
+      image:
+        'https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=300&h=300&fit=crop',
+      price: 650.0,
+      rating: 4.6,
+      reviewCount: 1456,
+      category: 'watches',
+    },
+    // ===== CLOTHING & FASHION SECTION =====
+    {
+      id: '27',
+      name: 'Uniqlo Airism Cotton Crew Neck T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
+      price: 12.9,
+      originalPrice: 14.9,
+      discount: '-13%',
+      rating: 4.3,
+      reviewCount: 892,
+      category: 'shirts',
+    },
+    {
+      id: '28',
+      name: 'Nike Dri-FIT Training T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop',
+      price: 25.0,
+      rating: 4.5,
+      reviewCount: 634,
+      category: 'shirts',
+      isNew: true,
+    },
+    {
+      id: '29',
+      name: 'Adidas 3-Stripes Essential T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1583743814966-8936f37f13fa?w=300&h=300&fit=crop',
+      price: 18.99,
+      originalPrice: 24.99,
+      discount: '-24%',
+      rating: 4.2,
+      reviewCount: 456,
+      category: 'shirts',
+    },
+    {
+      id: '30',
+      name: 'H&M Premium Cotton Polo Shirt',
+      image:
+        'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
+      price: 19.99,
+      rating: 4.0,
+      reviewCount: 278,
+      category: 'shirts',
+      isOutOfStock: true,
+    },
+    {
+      id: '31',
+      name: 'Zara Oversized Cotton T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=300&h=300&fit=crop',
+      price: 15.95,
+      originalPrice: 19.95,
+      discount: '-20%',
+      rating: 4.1,
+      reviewCount: 345,
+      category: 'shirts',
+    },
+    // ===== BACKPACKS & ACCESSORIES SECTION =====
+    {
+      id: '34',
+      name: 'Backpack / School Bag For Teenagers',
+      image:
+        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop',
+      price: 11.99,
+      rating: 4.0,
+      reviewCount: 89,
+      category: 'backpacks',
+    },
+    {
+      id: '35',
+      name: 'Puimentiua Men Backpack Laptop Bag Brand',
+      image:
+        'https://images.unsplash.com/photo-1581605405669-fcdf81165afa?w=300&h=300&fit=crop',
+      price: 10.99,
+      originalPrice: 14.79,
+      rating: 4.2,
+      reviewCount: 134,
+      category: 'backpacks',
+    },
+    {
+      id: '36',
+      name: 'WENYUJH 2019 New Large-capacity Student Schoolbag',
+      image:
+        'https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=300&h=300&fit=crop',
+      price: 12.62,
+      rating: 3.9,
+      reviewCount: 67,
+      category: 'backpacks',
+    },
+    {
+      id: '37',
+      name: 'Fashion Woman Bag Female Hand Tote Bag',
+      image:
+        'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=300&fit=crop',
+      price: 12.73,
+      originalPrice: 14.98,
+      rating: 4.1,
+      reviewCount: 98,
+      category: 'backpacks',
+    },
+    {
+      id: '38',
+      name: 'Women Oxford Backpack For Girls',
+      image:
+        'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=300&h=300&fit=crop',
+      price: 13.99,
+      rating: 4.3,
+      reviewCount: 156,
+      category: 'backpacks',
+    },
+    // ===== TABLETS SECTION =====
+    {
+      id: '39',
+      name: 'iPad Pro 12.9-inch (256GB)',
+      image:
+        'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=300&fit=crop',
+      price: 1099.0,
+      originalPrice: 1199.0,
+      discount: '-8%',
+      rating: 4.7,
+      reviewCount: 1234,
+      category: 'tablets',
+      isNew: true,
+    },
+    {
+      id: '40',
+      name: 'Samsung Galaxy Tab S9 (128GB)',
+      image:
+        'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=300&h=300&fit=crop',
+      price: 799.99,
+      rating: 4.5,
+      reviewCount: 567,
+      category: 'tablets',
+    },
+  ];
+
+  /**
+   * MẢNG SHIRTS RIÊNG BIỆT
+   * Được tạo để sử dụng riêng trong template, chứa các sản phẩm áo
+   * Lưu ý: Đây là duplicate data từ allProducts, có thể tối ưu thêm
+   */
+  shirts = [
+    {
+      id: '27',
+      name: 'Uniqlo Airism Cotton Crew Neck T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
+      price: 12.9,
+      originalPrice: 14.9,
+      discount: '-13%',
+      rating: 4.3,
+      reviewCount: 892,
+      category: 'shirts',
+    },
+    {
+      id: '28',
+      name: 'Nike Dri-FIT Training T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop',
+      price: 25.0,
+      rating: 4.5,
+      reviewCount: 634,
+      category: 'shirts',
+      isNew: true,
+    },
+    {
+      id: '29',
+      name: 'Adidas 3-Stripes Essential T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1583743814966-8936f37f13fa?w=300&h=300&fit=crop',
+      price: 18.99,
+      originalPrice: 24.99,
+      discount: '-24%',
+      rating: 4.2,
+      reviewCount: 456,
+      category: 'shirts',
+    },
+    {
+      id: '30',
+      name: 'H&M Premium Cotton Polo Shirt',
+      image:
+        'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
+      price: 19.99,
+      rating: 4.0,
+      reviewCount: 278,
+      category: 'shirts',
+      isOutOfStock: true,
+    },
+    {
+      id: '31',
+      name: 'Zara Oversized Cotton T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=300&h=300&fit=crop',
+      price: 15.95,
+      originalPrice: 19.95,
+      discount: '-20%',
+      rating: 4.1,
+      reviewCount: 345,
+      category: 'shirts',
+    },
+    {
+      id: '32',
+      name: 'Champion Classic Logo T-Shirt',
+      image:
+        'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=300&h=300&fit=crop',
+      price: 22.0,
+      rating: 4.4,
+      reviewCount: 567,
+      category: 'shirts',
+    },
+    {
+      id: '33',
+      name: 'Ralph Lauren Classic Fit Polo',
+      image:
+        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300&h=300&fit=crop',
+      price: 89.5,
+      originalPrice: 125.0,
+      discount: '-28%',
+      rating: 4.6,
+      reviewCount: 789,
+      category: 'shirts',
+      isNew: true,
+    },
+  ];
+
+  // ===== COMPUTED PROPERTIES & UTILITY METHODS =====
+
+  getProductsByCategory(category: string): Product[] {
+    return this.allProducts.filter((product) => product.category === category);
+  }
+
+  get filteredProducts(): Product[] {
+    return this.getProductsByCategory(this.activeCategory);
+  }
+
+  // ===== USER INTERACTION METHODS =====
+
+  selectCategory(categoryId: string): void {
+    this.activeCategory = categoryId;
+  }
+
+  getStarArray(rating: number): number[] {
+    return Array.from({ length: 5 }, (_, index) => index + 1);
+  }
+
+  // ===== TRACKING FUNCTIONS FOR PERFORMANCE =====
+
+  trackByCategory(index: number, category: Category): string {
+    return category.id;
+  }
+
+  trackByProduct(index: number, product: Product): string {
+    return product.id.toString();
+  }
+
+  trackByItem(index: number, item: BannerItem): string {
+    return item.id;
+  }
+
+  // ===== BANNER & PROMOTIONAL DATA =====
+
+  bannerItems: BannerItem[] = [
+    {
+      id: '1',
+      title: 'Comfort',
+      highlightText: 'Chair',
+      description: 'Official Chair',
+      image:
+        'https://asia.fleetcart.envaysoft.com/storage/media/SnNz5B0YIEGCw1OdLhFJbqF7hfCNc80adaLCdqOE.png',
+      backgroundColor: '#f8f9fa',
+      textColor: '#6c757d',
+      titleColor: '#2c3e50',
+    },
+    {
+      id: '2',
+      title: 'Adjust your bedroom with',
+      highlightText: 'comfortable',
+      description: 'products',
+      image:
+        'https://asia.fleetcart.envaysoft.com/storage/media/3YFgcINuEaLyLvy6QjxKwKVDMALI9qzmXEN7Vqx3.png',
+      backgroundColor: '#ffffff',
+      textColor: '#5a6c7d',
+      titleColor: '#2c3e50',
+    },
+    {
+      id: '3',
+      title: 'Galaxy',
+      highlightText: 'S9 | S9+',
+      description: 'The reimagined',
+      image:
+        'https://asia.fleetcart.envaysoft.com/storage/media/pmQxhyWNznFCMZvc4KTv4HNk4RfG3eBlNqR0xsCt.png',
+      backgroundColor: '#667eea',
+      textColor: '#ffffff',
+      titleColor: '#ffffff',
+    },
+  ];
+
+  // ===== BLOG POSTS DATA =====
+
+  posts: any[] = [
     {
       id: 1,
-      name: 'Uniq Leather Bags',
-      description: 'Premium quality leather bags',
-      price: 79,
-      originalPrice: 150,
-      discount: 'Starting: $79',
-      image: '/api/placeholder/300/200',
-      category: 'Fashion'
+      title: 'Stories of Satisfaction and Success',
+      author: 'Demo Admin',
+      date: '09 Aug, 2025',
+      image:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
+      excerpt:
+        'Discover how our customers achieved their goals through innovative solutions and dedicated support.',
     },
     {
       id: 2,
-      name: 'iPhone 6+ 32GB',
-      description: 'Apple iPhone with 32GB storage',
-      price: 599,
-      originalPrice: 799,
-      discount: 'Up to 50% Off',
-      image: '/api/placeholder/300/200',
-      category: 'Electronics'
-    }
+      title: 'Hear What Our Customers Have to Say',
+      author: 'Demo Admin',
+      date: '09 Aug, 2025',
+      image:
+        'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+      excerpt:
+        'Real testimonials from satisfied customers who have experienced exceptional service and results.',
+    },
+    {
+      id: 3,
+      title: 'Real-Life Testimonials from Satisfied Buyers',
+      author: 'Demo Admin',
+      date: '09 Aug, 2025',
+      image:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop',
+      excerpt:
+        'Authentic stories from buyers who found exactly what they were looking for and more.',
+    },
+    {
+      id: 4,
+      title: 'Key Trends Set to Dominate the E-commerce Landscape',
+      author: 'Demo Admin',
+      date: '09 Aug, 2025',
+      image:
+        'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400&h=300&fit=crop',
+      excerpt:
+        'Explore the emerging trends that are reshaping the future of online commerce and digital business.',
+    },
+    {
+      id: 5,
+      title: "What's Driving the Evolution of E-commerce?",
+      author: 'Demo Admin',
+      date: '09 Aug, 2025',
+      image:
+        'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop',
+      excerpt:
+        'An in-depth analysis of the factors and technologies transforming the e-commerce industry.',
+    },
   ];
 
-  // Sản phẩm chính hiển thị lớn
-  mainProduct: Product = {
-    id: 1,
-    name: 'DJI MAVIC PRO',
-    description: 'The creative\'s shop for flying cameras and flight controllers',
-    price: 1299,
-    image: '/api/placeholder/600/400',
-    category: 'Drones'
-  };
+  trackByPostId(index: number, post: any): number {
+    return post.id;
+  }
 
-  // Danh sách tính năng dịch vụ
-  serviceFeatures: ServiceFeature[] = [
-    { icon: 'headset_mic', title: '24/7 SUPPORT', description: 'Support every time', color: '#3498db' },
-    { icon: 'credit_card', title: 'ACCEPT PAYMENT', description: 'Visa, Paypal, Master', color: '#3498db' },
-    { icon: 'security', title: 'SECURED PAYMENT', description: '100% secured', color: '#3498db' },
-    { icon: 'local_shipping', title: 'FREE SHIPPING', description: 'Order over $100', color: '#3498db' },
-    { icon: 'assignment_return', title: '30 DAYS RETURN', description: '30 days guarantee', color: '#3498db' }
-  ];
+  // ===== NEWSLETTER SUBSCRIPTION PROPERTIES =====
 
-  //
-  // ==========================
-  // DỮ LIỆU CHO PRODUCT SHOWCASE - CODE MỚI ĐƯỢC GỘP
-  // ==========================
-  //
-
-  // Danh sách categories cho showcase (khác với categories chính)
-  showcaseCategories: Category[] = [
-    { id: 1, name: 'Laptops', icon: 'laptop_mac', selected: true, isActive: true },
-    { id: 2, name: 'Mobiles', icon: 'phone_android', selected: false, isActive: false },
-    { id: 3, name: 'Tablets', icon: 'tablet_mac', selected: false, isActive: false },
-    { id: 4, name: 'Watches', icon: 'watch', selected: false, isActive: false },
-    { id: 5, name: "Men's Fashion", icon: 'accessibility', selected: false, isActive: false },
-    { id: 6, name: 'Televisions', icon: 'tv', selected: false, isActive: false }
-  ];
-
-  // Danh sách sản phẩm showcase với đầy đủ thông tin
-  showcaseProducts: Product[] = [
-    {
-      id: 101,
-      name: 'Apple 2023 iMac (24-inch)',
-      description: 'M1 chip with 8-core CPU and 7-core GPU',
-      image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&h=200&fit=crop',
-      price: 1349.00,
-      rating: 0,
-      reviewCount: 0,
-      status: '',
-      category: 'Laptops'
-    },
-    {
-      id: 102,
-      name: 'Apple 2023 MacBook Pro (14-inch)',
-      description: 'M2 Pro chip with 10-core CPU',
-      image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&h=200&fit=crop',
-      price: 1499.00,
-      rating: 0,
-      reviewCount: 0,
-      status: '',
-      category: 'Laptops'
-    },
-    {
-      id: 103,
-      name: 'MSI Gaming Core i7 8Th Gen 15.6-inch Gaming Laptop',
-      description: 'High performance gaming laptop',
-      image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=300&h=200&fit=crop',
-      price: 760.00,
-      rating: 0,
-      reviewCount: 0,
-      status: 'Out of Stock',
-      isOutOfStock: true,
-      category: 'Laptops'
-    },
-    {
-      id: 104,
-      name: 'New Apple Mac Mini (3.6GHz Quad-core 8th-generation)',
-      description: 'Compact desktop computer',
-      image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=300&h=200&fit=crop',
-      price: 759.00,
-      rating: 0,
-      reviewCount: 0,
-      status: '',
-      category: 'Laptops'
-    },
-    {
-      id: 105,
-      name: 'LG gram Laptop - 13.3" Full HD Display, Intel 8th Gen',
-      description: 'Ultra-lightweight laptop',
-      image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop',
-      price: 2135.54,
-      originalPrice: 2425.75,
-      discount: '-12%',
-      rating: 0,
-      reviewCount: 0,
-      status: '',
-      isNew: true,
-      category: 'Laptops'
-    },
-    {
-      id: 106,
-      name: 'Razer Blade Stealth 13.3" QHD+ Intel Quad-Core',
-      description: 'Premium ultrabook',
-      image: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=300&h=200&fit=crop',
-      price: 1199.77,
-      rating: 0,
-      reviewCount: 0,
-      status: '',
-      isNew: true,
-      category: 'Laptops'
-    },
-    {
-      id: 107,
-      name: 'Razer Blade - Worlds Smallest 15.6in Gaming Laptop',
-      description: 'Compact gaming powerhouse',
-      image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=300&h=200&fit=crop',
-      price: 1500.00,
-      originalPrice: 1800.00,
-      discount: '-12%',
-      rating: 0,
-      reviewCount: 0,
-      status: '',
-      category: 'Laptops'
-    }
-  ];
-
-  //
-  // ==========================
-  // DỮ LIỆU FOOTER - CODE CŨ
-  // ==========================
-  //
-
-  // Email để đăng ký newsletter
   email: string = '';
+  emailError: string = '';
+  successMessage: string = '';
+  isSubscribing: boolean = false;
 
-  // Danh sách liên kết mạng xã hội
-  socialLinks: SocialLink[] = [
-    { name: 'Facebook', icon: 'facebook', url: '#' },
-    { name: 'Twitter', icon: 'close', url: '#' },
-    { name: 'Instagram', icon: 'camera_alt', url: '#' },
-    { name: 'YouTube', icon: 'play_circle_outline', url: '#' }
+  // ===== FOOTER TAGS DATA =====
+
+  tags: string[] = [
+    'Accessories',
+    'Electronics',
+    'Entertainment',
+    'Fashion',
+    'Gadgets',
+    'Hot deals',
+    'Lifestyle',
+    'Smartphone',
   ];
 
-  // Thông tin liên hệ
-  contactInfo: ContactInfo = {
-    phone: '+99012345678',
-    email: 'admin@email.com',
-    address: 'Dhaka, Mohammadpur'
-  };
+  // ===== LIFECYCLE HOOKS =====
 
-  // Các liên kết tài khoản
-  accountLinks: LinkItem[] = [
-    { name: 'Dashboard', url: '#' },
-    { name: 'My Orders', url: '#' },
-    { name: 'My Reviews', url: '#' },
-    { name: 'My Profile', url: '#' }
-  ];
+  constructor() {}
 
-  // Các liên kết dịch vụ
-  serviceLinks: LinkItem[] = [
-    { name: 'Return Policy', url: '#' },
-    { name: 'FAQ', url: '#' },
-    { name: 'Privacy & Policy', url: '#' },
-    { name: 'Terms Of Use', url: '#' }
-  ];
-
-  // Các liên kết thông tin
-  informationLinks: LinkItem[] = [
-    { name: 'New Arrivals', url: '#' },
-    { name: 'Specials', url: '#' },
-    { name: 'Hot Deals', url: '#' },
-    { name: 'Backpacks', url: '#' },
-    { name: 'Men\'s Fashion', url: '#' }
-  ];
-
-  // Danh sách thẻ tag
-  tags: Tag[] = [
-    { name: 'Accessories', icon: 'shopping_bag' },
-    { name: 'Electronics', icon: 'devices' },
-    { name: 'Entertainment', icon: 'movie' },
-    { name: 'Fashion', icon: 'checkroom' },
-    { name: 'Gadgets', icon: 'phone_android' },
-    { name: 'Hot deals', icon: 'local_fire_department' },
-    { name: 'Lifestyle', icon: 'favorite' },
-    { name: 'Smartphone', icon: 'smartphone' }
-  ];
-
-  // Danh sách phương thức thanh toán
-  paymentMethods: string[] = [
-    'Visa', 'MasterCard', 'PayPal', 'American Express', 'Maestro', 'Discover'
-  ];
-
-  //
-  // ==========================
-  // BIẾN TRẠNG THÁI KHÁC - CODE CŨ
-  // ==========================
-  //
-
-  // Trạng thái menu mobile
-  isMobileMenuOpen = false;
-  // Slide hiện tại của carousel
-  currentSlide = 0;
-
-  //
-  // ==========================
-  // HÀM XỬ LÝ DROPDOWN - CODE CŨ
-  // ==========================
-  //
-
-  // Bật/tắt dropdown ngôn ngữ
-  toggleLanguageDropdown(): void {
-    this.isLanguageOpen = !this.isLanguageOpen;
-    if (this.isLanguageOpen) this.isCurrencyOpen = false;
+  ngOnInit(): void {
+    this.accessToken = localStorage.getItem('accessToken');
   }
 
-  // Bật/tắt dropdown tiền tệ
-  toggleCurrencyDropdown(): void {
-    this.isCurrencyOpen = !this.isCurrencyOpen;
-    if (this.isCurrencyOpen) this.isLanguageOpen = false;
-  }
+  // ===== NEWSLETTER SUBSCRIPTION METHODS =====
 
-  // Chọn ngôn ngữ từ dropdown
-  selectLanguage(language: Language): void {
-    this.selectedLanguage = language.name;
-    this.isLanguageOpen = false;
-    console.log(`Language changed to: ${language.name} (${language.code})`);
-  }
-
-  // Chọn tiền tệ từ dropdown
-  selectCurrency(currency: Currency): void {
-    this.selectedCurrency = currency.code;
-    this.isCurrencyOpen = false;
-    console.log(`Currency changed to: ${currency.code}`);
-  }
-
-  // Lắng nghe sự kiện click bên ngoài để đóng dropdown
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.custom-dropdown')) this.closeAllDropdowns();
-  }
-
-
-  // Đóng tất cả dropdown
-  private closeAllDropdowns(): void {
-    this.isLanguageOpen = false;
-    this.isCurrencyOpen = false;
-  }
-
-  // Đóng dropdown ngôn ngữ
-  closeLanguageDropdown(): void {
-    this.isLanguageOpen = false;
-  }
-
-  // Đóng dropdown tiền tệ
-  closeCurrencyDropdown(): void {
-    this.isCurrencyOpen = false;
-  }
-
-  //
-  // ==========================
-  // HÀM XỬ LÝ CHUNG - CODE CŨ
-  // ==========================
-  //
-
-  // Bật/tắt menu mobile
-  toggleMobileMenu(): void {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
-  }
-
-  // Xử lý tìm kiếm
-  onSearch(event: Event): void {
-    const searchTerm = (event.target as HTMLInputElement).value;
-    console.log('Searching for:', searchTerm);
-  }
-
-  // Xử lý click vào category chính
-  onCategoryClick(category: Category): void {
-    this.categories.forEach(cat => cat.isSelected = false);
-    category.isSelected = true;
-    console.log('Category clicked:', category.name);
-  }
-
-  // Xử lý hover vào category
-  onCategoryHover(category: Category): void {
-    console.log('Category hovered:', category.name);
-  }
-
-  // Xử lý click vào sản phẩm
-  onProductClick(product: Product): void {
-    console.log('Product clicked:', product.name);
-  }
-
-  // Thêm sản phẩm vào giỏ hàng
-  addToCart(product: Product): void {
-    console.log('Added to cart:', product.name);
-  }
-
-  // Thêm sản phẩm vào danh sách yêu thích
-  addToWishlist(product: Product): void {
-    console.log('Added to wishlist:', product.name);
-  }
-
-  // Chuyển đến slide tiếp theo
-  nextSlide(): void {
-    this.currentSlide = (this.currentSlide + 1) % this.featuredProducts.length;
-  }
-
-  // Chuyển đến slide trước đó
-  previousSlide(): void {
-    this.currentSlide = this.currentSlide === 0 ? this.featuredProducts.length - 1 : this.currentSlide - 1;
-  }
-
-  // Chuyển đến slide cụ thể
-  goToSlide(index: number): void {
-    this.currentSlide = index;
-  }
-
-  // Thay đổi ngôn ngữ
-  changeLanguage(language: string): void {
-    console.log('Language changed to:', language);
-  }
-
-  // Thay đổi tiền tệ
-  changeCurrency(currency: string): void {
-    console.log('Currency changed to:', currency);
-  }
-
-  // Xử lý hành động xác thực
-  onAuthAction(action: string): void {
-    console.log('Auth action:', action);
-  }
-
-  // Đăng ký newsletter
   onSubscribe(): void {
-    if (this.email && this.validateEmail(this.email)) {
-      console.log('Subscribing email:', this.email);
-      alert('Thank you for subscribing!');
-      this.email = '';
-    } else {
-      alert('Please enter a valid email address');
+    // Reset messages
+    this.emailError = '';
+    this.successMessage = '';
+
+    // Validation: Check if email is provided
+    if (!this.email) {
+      this.emailError = 'Email address is required';
+      return;
     }
+
+    // Validation: Check email format
+    if (!this.isValidEmail(this.email)) {
+      this.emailError = 'Please enter a valid email address';
+      return;
+    }
+
+    // Set loading state
+    this.isSubscribing = true;
+
+    setTimeout(() => {
+      this.isSubscribing = false;
+      this.successMessage = 'Thank you for subscribing to our newsletter!';
+      this.email = '';
+    }, 1500);
   }
 
-  // Kiểm tra tính hợp lệ của email
-  private validateEmail(email: string): boolean {
+  private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  // Xử lý click vào liên kết mạng xã hội
-  onSocialClick(name: string, url: string): void {
-    console.log(`Navigating to ${name}:`, url);
-  }
+  // ===== UTILITY METHODS =====
 
-  // Xử lý click vào liên kết
-  onLinkClick(name: string, url: string): void {
-    console.log(`Navigating to ${name}:`, url);
-  }
-
-  // Xử lý click vào tag
-  onTagClick(name: string): void {
-    console.log(`Filtering by tag:`, name);
-  }
-
-  // Cuộn lên đầu trang
   scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  //
-  // ==========================
-  // HÀM XỬ LÝ CHO PRODUCT SHOWCASE - CODE MỚI ĐƯỢC GỘP
-  // ==========================
-  //
-
-  // Xử lý khi click vào showcase category
-  onShowcaseCategoryClick(selectedCategory: Category): void {
-    // Reset tất cả showcase categories
-    this.showcaseCategories.forEach(category => {
-      category.selected = category.id === selectedCategory.id;
-      category.isActive = category.id === selectedCategory.id;
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
     });
-    console.log('Showcase category selected:', selectedCategory.name);
-
-    // Có thể thêm logic filter sản phẩm theo category
-    this.filterProductsByCategory(selectedCategory.name);
-  }
-
-  // Xử lý khi click vào nút add to cart trong showcase
-  onShowcaseAddToCart(product: Product): void {
-    if (product.status === 'Out of Stock' || product.isOutOfStock) {
-      console.log('Cannot add out of stock product:', product.name);
-      alert('This product is out of stock!');
-      return;
-    }
-    console.log('Added showcase product to cart:', product.name);
-    // Gọi lại hàm addToCart chung
-    this.addToCart(product);
-  }
-
-  // Xử lý khi click vào nút view details trong showcase
-  onShowcaseViewDetails(product: Product): void {
-    console.log('View showcase product details:', product.name);
-    // Logic xem chi tiết sản phẩm
-    this.onProductClick(product);
-  }
-
-  // Hàm tương thích với code cũ - xử lý click category showcase
-  onCategoryClick_Showcase(category: Category): void {
-    this.onShowcaseCategoryClick(category);
-  }
-
-  // Hàm tương thích với code cũ - xử lý add to cart showcase
-  onAddToCart_Showcase(product: Product): void {
-    this.onShowcaseAddToCart(product);
-  }
-
-  // Hàm tương thích với code cũ - xử lý view details showcase
-  onViewDetails_Showcase(product: Product): void {
-    this.onShowcaseViewDetails(product);
-  }
-
-  // Tạo array stars để hiển thị rating
-  getStars(rating: number): boolean[] {
-    return Array(5).fill(false).map((_, i) => i < rating);
-  }
-
-  // Format giá tiền với currency
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: this.selectedCurrency || 'USD'
-    }).format(price);
-  }
-
-  // Filter sản phẩm theo category
-  private filterProductsByCategory(categoryName: string): void {
-    console.log('Filtering products by category:', categoryName);
-    // Logic filter sản phẩm nếu cần
-    // Ví dụ: this.showcaseProducts = this.showcaseProducts.filter(p => p.category === categoryName);
-  }
-
-  //
-  // ==========================
-  // TRACKBY FUNCTIONS - TỐI ƯU *ngFor
-  // ==========================
-  //
-
-  // TrackBy cho service features
-  trackByServiceFeature(index: number, feature: ServiceFeature): string {
-    return feature.title;
-  }
-
-  // TrackBy cho categories chính
-  trackByCategory(index: number, category: Category): number {
-    return category.id;
-  }
-
-  // TrackBy cho showcase categories
-  trackByShowcaseCategory(index: number, category: Category): number {
-    return category.id;
-  }
-
-  // TrackBy cho showcase products
-  trackByShowcaseProduct(index: number, product: Product): number {
-    return product.id;
-  }
-
-  // TrackBy cho featured products
-  trackByFeaturedProduct(index: number, product: Product): number {
-    return product.id;
-  }
-
-  // TrackBy cho social links
-  trackBySocialLink(index: number, link: SocialLink): string {
-    return link.name;
-  }
-
-  // TrackBy cho tags
-  trackByTag(index: number, tag: Tag): string {
-    return tag.name;
-  }
-
-  // TrackBy cho links
-  trackByLink(index: number, link: LinkItem): string {
-    return link.name;
   }
 }

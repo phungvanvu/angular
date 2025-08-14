@@ -1,0 +1,204 @@
+[
+  {
+    "id": 1,
+    "name": "Apple AirPods Pro",
+    "price": 299.0,
+    "image": "./products/3115_acer_aspire_a514_56p_gray_a8.jpg",
+    "rating": 4,
+    "reviews": 15,
+    "createdAt": "2024-07-01T10:00:00Z",
+    "categories": ["electronics", "consumer-electronics"]
+  },
+  {
+    "id": 2,
+    "name": "Samsung Galaxy Watch 5",
+    "price": 249.0,
+    "image": "./products/90448_laptop_hp_14_ep0220tu_b73vwpa_0004_layer_2.jpgs",
+    "rating": 4,
+    "reviews": 12,
+    "badge": "-10%",
+    "badgeColor": "success",
+    "createdAt": "2024-06-25T12:00:00Z",
+    "categories": ["electronics", "watches"]
+  },
+  {
+    "id": 3,
+    "name": "Dell Inspiron 15",
+    "price": 599.0,
+    "image": "./products/dell-pro-laptops-category-image-800x620.jpg",
+    "rating": 3,
+    "reviews": 7,
+    "createdAt": "2024-06-20T15:00:00Z",
+    "categories": ["electronics"]
+  },
+  {
+    "id": 4,
+    "name": "Sony WH-1000XM4",
+    "price": 349.0,
+    "image": "./products/images (1).jpg",
+    "rating": 5,
+    "reviews": 20,
+    "createdAt": "2024-07-05T09:00:00Z",
+    "categories": ["electronics"]
+  },
+  {
+    "id": 5,
+    "name": "Fossil Gen 6 Smartwatch",
+    "price": 299.0,
+    "image": "./products/images.jpg",
+    "rating": 4,
+    "reviews": 9,
+    "createdAt": "2024-06-10T10:00:00Z",
+    "categories": ["watches"]
+  },
+  {
+    "id": 6,
+    "name": "Xiaomi Redmi Note 12",
+    "price": 1199.0,
+    "image": "./products/tải xuống (1).jpg",
+    "rating": 5,
+    "reviews": 18,
+    "createdAt": "2024-07-01T10:30:00Z",
+    "categories": ["electronics"]
+  },
+  {
+    "id": 7,
+    "name": "Samsung Galaxy A14",
+    "price": 99.0,
+    "image": "./products/tải xuống (2).jpg",
+    "rating": 4,
+    "reviews": 10,
+    "createdAt": "2024-07-03T11:00:00Z",
+    "categories": ["electronics"]
+  },
+  {
+    "id": 8,
+    "name": "Vivo Y36 5G",
+    "price": 49.0,
+    "image": "./products/tải xuống (3).jpg",
+    "rating": 3,
+    "reviews": 4,
+    "createdAt": "2024-06-18T13:00:00Z",
+    "categories": ["electronics"]
+  },
+  {
+    "id": 9,
+    "name": "OPPO A78",
+    "price": 89.0,
+    "image": "./products/tải xuống.jpg",
+    "rating": 4,
+    "reviews": 6,
+    "createdAt": "2024-07-02T14:00:00Z",
+    "categories": ["backpacks", "mens-fashion"]
+  },
+  {
+    "id": 10,
+    "name": "Women’s Fashion Tote",
+    "price": 79.0,
+    "image": "./products/images (1).jpg",
+    "rating": 5,
+    "reviews": 10,
+    "createdAt": "2024-06-30T08:30:00Z",
+    "categories": ["backpacks", "womens-fashion"]
+  },
+  {
+    "id": 11,
+    "name": "Xiaomi Smart Vacuum",
+    "price": 249.0,
+    "image": "./products/images (2).jpg",
+    "rating": 4,
+    "reviews": 8,
+    "createdAt": "2024-07-04T09:30:00Z",
+    "categories": ["home-appliances"]
+  },
+  {
+    "id": 12,
+    "name": "Dyson Supersonic Hair Dryer",
+    "price": 399.0,
+    "image": "./products/images (3).jpg",
+    "rating": 5,
+    "reviews": 22,
+    "createdAt": "2024-07-06T10:45:00Z",
+    "categories": ["home-appliances"]
+  },
+  {
+    "id": 13,
+    "name": "Casio Digital Watch",
+    "price": 59.0,
+    "image": "./products/images (4).jpg",
+    "rating": 3,
+    "reviews": 5,
+    "createdAt": "2024-06-26T11:20:00Z",
+    "categories": ["watches"]
+  },
+  {
+    "id": 14,
+    "name": "Samsung Smart Fridge",
+    "price": 1799.0,
+    "image": "./products/tải xuống.jpg",
+    "rating": 5,
+    "reviews": 12,
+    "createdAt": "2024-06-21T10:00:00Z",
+    "categories": ["home-appliances"]
+  },
+  {
+    "id": 15,
+    "name": "Men’s Business Shoes",
+    "price": 129.0,
+    "image": "./products/dell-pro-laptops-category-image-800x620.jpg",
+    "rating": 4,
+    "reviews": 11,
+    "createdAt": "2024-06-28T09:15:00Z",
+    "categories": ["mens-fashion"]
+  },
+  {
+    "id": 16,
+    "name": "Women’s Heels",
+    "price": 139.0,
+    "image": "./products/3115_acer_aspire_a514_56p_gray_a8.jpg",
+    "rating": 4,
+    "reviews": 14,
+    "createdAt": "2024-07-01T08:40:00Z",
+    "categories": ["womens-fashion"]
+  },
+  {
+    "id": 17,
+    "name": "Smart LED TV 55\"",
+    "price": 699.0,
+    "image": "./products/images.jpg",
+    "rating": 5,
+    "reviews": 17,
+    "createdAt": "2024-07-03T12:00:00Z",
+    "categories": ["electronics", "consumer-electronics"]
+  },
+  {
+    "id": 18,
+    "name": "Canon EOS M50 Camera",
+    "price": 649.0,
+    "image": "./products/dell-pro-laptops-category-image-800x620.jpg",
+    "rating": 5,
+    "reviews": 13,
+    "createdAt": "2024-06-29T14:10:00Z",
+    "categories": ["electronics"]
+  },
+  {
+    "id": 19,
+    "name": "TCL Air Conditioner",
+    "price": 499.0,
+    "image": "./products/images (4).jpg",
+    "rating": 4,
+    "reviews": 7,
+    "createdAt": "2024-06-15T15:00:00Z",
+    "categories": ["home-appliances"]
+  },
+  {
+    "id": 20,
+    "name": "JBL Bluetooth Speaker",
+    "price": 129.0,
+    "image": "./products/3115_acer_aspire_a514_56p_gray_a8.jpg",
+    "rating": 5,
+    "reviews": 18,
+    "createdAt": "2024-07-05T16:00:00Z",
+    "categories": ["electronics"]
+  }
+]

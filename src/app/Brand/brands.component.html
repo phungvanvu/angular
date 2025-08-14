@@ -1,0 +1,25 @@
+<div class="brands-wrapper">
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <!-- Bảng thương hiệu -->
+  <app-generic-table
+    [title]="'Brand'"
+    [columns]="brandColumns"
+    [data]="brands"
+    [selectedIds]="selectedBrandIds"
+    (selectedIdsChange)="selectedBrandIds = $event"
+    [loading]="loading"
+    [keyword]="keyword"
+    (keywordChange)="keyword = $event"
+    [pagination]="{
+      page: page,
+      size: size,
+      totalItems: totalItems,
+      onPageChange: onPageChange.bind(this)
+    }"
+    [showDeleteButton]="true"
+    (deleteSelected)="deleteSelectedBrands()"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (create)="onCreate()"
+    (rowClick)="onBrandRowClick($event)"
+  />
+</div>
