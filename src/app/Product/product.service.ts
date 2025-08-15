@@ -119,7 +119,8 @@ export interface ServiceData {
   providedIn: 'root',
 })
 export class ProductService {
-  private baseUrl = 'http://localhost:8080/elec/api/v1';
+  private baseUrl =
+    'https://electacme-production-app-0b1dc16f2bb0.herokuapp.com/elec/api/v1';
   private dataSubject = new BehaviorSubject<ServiceData>({
     brands: [],
     categories: [],

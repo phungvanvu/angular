@@ -17,10 +17,11 @@ export interface Category {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CategoryService {
-  private baseUrl = 'http://localhost:8080/elec/api/v1/categories';
+  private baseUrl =
+    'https://electacme-production-app-0b1dc16f2bb0.herokuapp.com//elec/api/v1/categories';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -40,37 +41,59 @@ export class CategoryService {
 
   getCategories(): Observable<any[]> {
     return this.http
-      .get<{ code: number; message: string; result: any[] }>(
-        this.baseUrl,
-        { headers: this.getAuthHeaders() }
-      )
-      .pipe(map(response => response.result));
+      .get<{ code: number; message: string; result: any[] }>(this.baseUrl, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(map((response) => response.result));
   }
 
-  createCategory(formData: { id: number | null; name: string; searchable: boolean; status: boolean; imageUrl: string; parentId?: number | null }): Observable<any> {
+  createCategory(formData: {
+    id: number | null;
+    name: string;
+    searchable: boolean;
+    status: boolean;
+    imageUrl: string;
+    parentId?: number | null;
+  }): Observable<any> {
     const payload = {
       name: formData.name,
       searchable: formData.searchable,
       isActive: formData.status,
       imageUrl: formData.imageUrl,
-      parentId: formData.parentId ?? null
+      parentId: formData.parentId ?? null,
     };
-    return this.http.post(this.baseUrl, payload, { headers: this.getAuthHeaders() });
+    return this.http.post(this.baseUrl, payload, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
-  updateCategory(id: number, formData: { id: number | null; name: string; searchable: boolean; status: boolean; imageUrl: string; parentId?: number | null }): Observable<any> {
+  updateCategory(
+    id: number,
+    formData: {
+      id: number | null;
+      name: string;
+      searchable: boolean;
+      status: boolean;
+      imageUrl: string;
+      parentId?: number | null;
+    }
+  ): Observable<any> {
     const payload = {
       id: formData.id,
       name: formData.name,
       searchable: formData.searchable,
       isActive: formData.status,
       imageUrl: formData.imageUrl,
-      parentId: formData.parentId ?? null
+      parentId: formData.parentId ?? null,
     };
-    return this.http.put(`${this.baseUrl}/${id}`, payload, { headers: this.getAuthHeaders() });
+    return this.http.put(`${this.baseUrl}/${id}`, payload, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`, { headers: this.getAuthHeaders() });
+    return this.http.delete(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }

@@ -103,7 +103,7 @@ export class CreatProductComponent implements OnInit {
             this.variationTemplates = Array.isArray(data.variationTemplates)
               ? [...data.variationTemplates]
               : [];
-            console.log('Data loaded:', {
+            console.log('Dữ liệu đã tải:', {
               brands: this.brands,
               categories: this.categories,
               variationTemplates: this.variationTemplates,
@@ -120,7 +120,7 @@ export class CreatProductComponent implements OnInit {
           });
         },
         error: (error) => {
-          console.error('Error loading initial data:', error);
+          console.error('Lỗi khi tải dữ liệu ban đầu:', error);
         },
       });
     });
@@ -129,7 +129,7 @@ export class CreatProductComponent implements OnInit {
   loadProduct(id: string) {
     this.productService.getProductById(id).subscribe({
       next: (product) => {
-        console.log('Loaded product data:', product);
+        console.log('Sản phẩm đã tải:', product);
         this.name = product.name || '';
         this.htmlContent = product.description || '';
         this.brandId = product.brandId ?? null;
@@ -152,10 +152,10 @@ export class CreatProductComponent implements OnInit {
             )}`
           : null;
 
-        // Load images from entity-files
+        // Tải hình ảnh từ entity-files
         this.productService.getEntityFiles('product', id).subscribe({
           next: (files) => {
-            console.log('getEntityFiles response:', files);
+            console.log('Tệp thực thể:', files);
             if (Array.isArray(files)) {
               files.forEach((file) => {
                 const url = `http://localhost:8080/elec/${file.path.replace(
@@ -170,7 +170,7 @@ export class CreatProductComponent implements OnInit {
                 }
               });
             } else {
-              console.warn('getEntityFiles did not return an array:', files);
+              console.warn('getEntityFiles không trả về mảng:', files);
               this.thumbnailFileId = null;
               this.thumbnailPreview = product.thumbnail
                 ? `http://localhost:8080/elec/${product.thumbnail.replace(
@@ -183,7 +183,7 @@ export class CreatProductComponent implements OnInit {
             this.cdr.detectChanges();
           },
           error: (err) => {
-            console.error('Error loading product images:', err);
+            console.error('Lỗi khi tải hình ảnh sản phẩm:', err);
             this.thumbnailFileId = null;
             this.thumbnailPreview = product.thumbnail
               ? `http://localhost:8080/elec/${product.thumbnail.replace(
@@ -314,7 +314,7 @@ export class CreatProductComponent implements OnInit {
           '';
         this.showVariantsSection = this.variants.length > 0;
 
-        console.log('Updated state:', {
+        console.log('Trạng thái đã cập nhật:', {
           brandId: this.brandId,
           categoryId: this.categoryId,
           variationIds: this.selectedVariationIds,
@@ -324,7 +324,7 @@ export class CreatProductComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error loading product:', error);
+        console.error('Lỗi khi tải sản phẩm:', error);
       },
     });
   }
@@ -336,6 +336,7 @@ export class CreatProductComponent implements OnInit {
   }
 
   onFileInserted(event: { fileId: number; zone: string; thumbnail: string }) {
+    console.log('Sự kiện chèn tệp:', event);
     if (event.zone === 'thumbnail') {
       this.thumbnailFileId = event.fileId;
       this.thumbnailPreview = event.thumbnail;
@@ -458,7 +459,7 @@ export class CreatProductComponent implements OnInit {
 
     this.variations.push(newVariation);
     this.selectedVariationIds.push(selectedTemplate.id);
-    console.log('Variations after insert:', this.variations);
+    console.log('Variations sau khi chèn:', this.variations);
     console.log('Selected variationIds:', this.selectedVariationIds);
     this.updateVariants();
     this.selectedTemplateId = null;
@@ -618,8 +619,8 @@ export class CreatProductComponent implements OnInit {
     }
 
     this.variations = filteredVariations;
-    console.log('Variations after update:', this.variations);
-    console.log('Variants after update:', this.variants);
+    console.log('Variations sau khi cập nhật:', this.variations);
+    console.log('Variants sau khi cập nhật:', this.variants);
     this.cdr.detectChanges();
   }
 
@@ -627,7 +628,7 @@ export class CreatProductComponent implements OnInit {
     this.variants.forEach((variant) => {
       variant.isDefault = variant.name === this.defaultVariantName;
     });
-    console.log('Default variant set:', this.defaultVariantName);
+    console.log('Default variant được đặt:', this.defaultVariantName);
     this.cdr.detectChanges();
   }
 
@@ -642,17 +643,18 @@ export class CreatProductComponent implements OnInit {
   }
 
   onSave(): void {
-    // Chỉ yêu cầu thumbnailFileId khi tạo mới hoặc khi thumbnail chưa được đặt
-    if (
-      this.productForm.valid &&
-      this.categoryId !== null &&
-      (this.isEditMode ? this.thumbnail !== '' : this.thumbnailFileId !== null)
-    ) {
+    if (this.productForm.valid && this.categoryId !== null) {
       this.submitForm(false);
     } else {
       this.productForm.control.markAllAsTouched();
+      let errorMessage = 'Vui lòng kiểm tra lại biểu mẫu:';
+      if (!this.productForm.valid)
+        errorMessage += '\n- Vui lòng điền đầy đủ các trường bắt buộc.';
+      if (this.categoryId === null)
+        errorMessage += '\n- Chọn danh mục sản phẩm.';
+      alert(errorMessage);
       console.log(
-        'Form invalid:',
+        'Biểu mẫu không hợp lệ:',
         this.productForm.errors,
         'categoryId:',
         this.categoryId,
@@ -666,17 +668,18 @@ export class CreatProductComponent implements OnInit {
   }
 
   onSaveAndExit(): void {
-    // Chỉ yêu cầu thumbnailFileId khi tạo mới hoặc khi thumbnail chưa được đặt
-    if (
-      this.productForm.valid &&
-      this.categoryId !== null &&
-      (this.isEditMode ? this.thumbnail !== '' : this.thumbnailFileId !== null)
-    ) {
+    if (this.productForm.valid && this.categoryId !== null) {
       this.submitForm(true);
     } else {
       this.productForm.control.markAllAsTouched();
+      let errorMessage = 'Vui lòng kiểm tra lại biểu mẫu:';
+      if (!this.productForm.valid)
+        errorMessage += '\n- Vui lòng điền đầy đủ các trường bắt buộc.';
+      if (this.categoryId === null)
+        errorMessage += '\n- Chọn danh mục sản phẩm.';
+      alert(errorMessage);
       console.log(
-        'Form invalid:',
+        'Biểu mẫu không hợp lệ:',
         this.productForm.errors,
         'categoryId:',
         this.categoryId,
@@ -690,15 +693,16 @@ export class CreatProductComponent implements OnInit {
   }
 
   private submitForm(exit: boolean): void {
-    // Kiểm tra validation
-    if (
-      !this.productForm.valid ||
-      this.categoryId === null ||
-      (this.isEditMode ? this.thumbnail === '' : this.thumbnailFileId === null)
-    ) {
+    if (!this.productForm.valid || this.categoryId === null) {
       this.productForm.control.markAllAsTouched();
+      let errorMessage = 'Vui lòng kiểm tra lại biểu mẫu:';
+      if (!this.productForm.valid)
+        errorMessage += '\n- Vui lòng điền đầy đủ các trường bắt buộc.';
+      if (this.categoryId === null)
+        errorMessage += '\n- Chọn danh mục sản phẩm.';
+      alert(errorMessage);
       console.log(
-        'Form invalid:',
+        'Biểu mẫu không hợp lệ:',
         this.productForm.errors,
         'categoryId:',
         this.categoryId,
@@ -736,7 +740,7 @@ export class CreatProductComponent implements OnInit {
       thumbnail: this.thumbnail || null,
     };
 
-    console.log('Submitting productInput:', productInput);
+    console.log('Gửi productInput:', productInput);
 
     // Gọi API để lưu sản phẩm
     const saveObservable =
@@ -749,13 +753,13 @@ export class CreatProductComponent implements OnInit {
 
     saveObservable.subscribe({
       next: (res: any) => {
-        console.log('API response:', res); // Debug API response
+        console.log('Phản hồi API:', res);
         const productId = this.isEditMode
           ? String(this.editProductId)
           : res.result.id;
         const attaches = [];
 
-        // Attach thumbnail
+        // Gắn thumbnail nếu có
         if (this.thumbnailFileId) {
           attaches.push(
             this.productService.postEntityFile({
@@ -767,7 +771,7 @@ export class CreatProductComponent implements OnInit {
           );
         }
 
-        // Attach gallery images
+        // Gắn hình ảnh gallery
         this.galleryPreviews.forEach((image) => {
           attaches.push(
             this.productService.postEntityFile({
@@ -793,7 +797,7 @@ export class CreatProductComponent implements OnInit {
               this.resetForm();
             },
             error: (err) => {
-              console.error('Attach images failed:', err);
+              console.error('Gắn hình ảnh thất bại:', err);
               alert(
                 (this.isEditMode ? 'Cập nhật' : 'Tạo') +
                   ' sản phẩm thành công nhưng gắn ảnh thất bại.'
@@ -817,7 +821,7 @@ export class CreatProductComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error saving product:', error);
+        console.error('Lỗi khi lưu sản phẩm:', error);
         alert(
           this.isEditMode
             ? 'Cập nhật sản phẩm thất bại'
