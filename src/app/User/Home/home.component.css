@@ -15,8 +15,10 @@ body {
 }
 
 .container {
+  width: 100%;
   margin: 0 auto;
-  padding: 0 100px;
+  padding: 0 20px; /* padding nhỏ hơn để không mất nhiều diện tích */
+  box-sizing: border-box;
 }
 
 /* ===== UTILITY CLASSES ===== */
@@ -771,7 +773,7 @@ body {
 }
 
 .subtitle {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   color: #6b7280;
   margin: 0;
   line-height: 1.6;
@@ -1839,14 +1841,13 @@ body {
 }
 
 .footer-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 40px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .footer-column {
-  display: flex;
-  flex-direction: column;
+  flex: 1; /* chia đều chiều rộng */
 }
 
 .column-title {

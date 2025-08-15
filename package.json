@@ -24,6 +24,7 @@
     "@kolkov/angular-editor": "^3.0.0-beta.2",
     "@tinymce/tinymce-angular": "^9.0.0",
     "axios": "^1.10.0",
+    "chart.js": "^4.5.0",
     "datatables.net-bs": "^2.3.2",
     "express": "^5.1.0",
     "flatpickr": "^4.6.13",

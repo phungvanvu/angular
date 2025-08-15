@@ -1,4 +1,10 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  NgZone,
+  ChangeDetectorRef,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,6 +33,8 @@ export interface Product {
   inStock: boolean;
   newFrom: string;
   newTo: string;
+  variants?: any[];
+  variations?: any[];
 }
 
 export interface Category {
@@ -56,6 +64,9 @@ export class ShopComponent implements OnInit {
   toastVisible: boolean = false;
   toastTimeout: ReturnType<typeof setTimeout> | null = null;
   showLoginModal: boolean = false;
+  showUserMenu: boolean = false;
+  userName: string = '';
+  userEmail: string = '';
 
   sortOptions = ['Default', 'Latest', 'Price Low to High', 'Price High to Low'];
   itemsPerPageOptions = [5, 10, 20, 30];
@@ -109,11 +120,36 @@ export class ShopComponent implements OnInit {
     });
 
     this.fetchProducts();
+    this.loadUserInfo();
 
     this.cartService.cart$.subscribe((cart) => {
       this.cartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
       this.cd.detectChanges();
     });
+  }
+  loadUserInfo() {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.userName = payload.name || 'User';
+        this.userEmail = payload.sub || '';
+      } catch (err) {
+        console.error('Invalid token', err);
+      }
+    }
+  }
+
+  toggleUserMenu() {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-dropdown') && this.showUserMenu) {
+      this.showUserMenu = false;
+    }
   }
 
   toggleCategory(categoryId: string): void {
@@ -209,6 +245,7 @@ export class ShopComponent implements OnInit {
               }
             }
 
+            // Lấy biến thể đầu tiên làm mặc định
             const firstVariant =
               product.variants && product.variants.length > 0
                 ? product.variants[0]
@@ -220,7 +257,7 @@ export class ShopComponent implements OnInit {
             const currentDate = new Date();
             const newFrom = product.newFrom ? new Date(product.newFrom) : null;
             const newTo = product.newTo ? new Date(product.newTo) : null;
-            let badge = product.inStock === false ? 'Out of Stock' : undefined;
+            let badge = product.inStock === false ? 'Hết hàng' : undefined;
             let badgeColor = product.inStock === false ? 'danger' : 'success';
             if (
               !badge &&
@@ -231,19 +268,17 @@ export class ShopComponent implements OnInit {
               currentDate >= newFrom &&
               currentDate <= newTo
             ) {
-              badge = 'New';
+              badge = 'Mới';
               badgeColor = 'success';
             }
 
             return {
               id: product.id || 0,
-              name: product.name || 'Unknown Product',
+              name: product.name || 'Sản phẩm không xác định',
               minPrice: product.minPrice || 0,
               maxPrice: product.maxPrice || product.minPrice || 0,
               variantName,
               variantId,
-              variantType: firstVariant.type,
-              variants: product.variants,
               price,
               image: product.thumbnail
                 ? `http://localhost:8080/elec/${product.thumbnail.replace(
@@ -259,6 +294,8 @@ export class ShopComponent implements OnInit {
               inStock: product.inStock ?? true,
               newFrom: product.newFrom || '',
               newTo: product.newTo || '',
+              variants: product.variants || [],
+              variations: product.variations || [],
             };
           });
 
@@ -289,7 +326,7 @@ export class ShopComponent implements OnInit {
           this.cd.detectChanges();
         },
         error: (err) => {
-          console.error('API error:', err);
+          console.error('Lỗi API:', err);
           this.error = 'Không thể tải dữ liệu sản phẩm.';
           this.loading = false;
           this.filteredProducts = [];
@@ -342,9 +379,13 @@ export class ShopComponent implements OnInit {
     if (!product.quantity || product.quantity < 1) {
       product.quantity = 1;
     }
+    if (product.variants && product.variants.length > 0 && !product.variantId) {
+      this.showToast('Không tìm thấy biến thể sản phẩm');
+      return;
+    }
     const accessToken = this.auth.getAccessToken();
     if (!accessToken) {
-      this.router.navigate(['/login']);
+      this.showLoginModal = true;
       return;
     }
     let isValid = await this.auth.isAccessTokenValid();
@@ -352,12 +393,14 @@ export class ShopComponent implements OnInit {
       const refreshed = await this.auth.refreshToken();
       if (!refreshed) {
         this.auth.logout();
+        this.showLoginModal = true;
         return;
       }
       isValid = await this.auth.isAccessTokenValid();
       if (!isValid) {
         this.showToast('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
         this.auth.logout();
+        this.showLoginModal = true;
         return;
       }
     }
@@ -368,12 +411,13 @@ export class ShopComponent implements OnInit {
         : product.name;
       this.showToast(`${productName} đã được thêm vào giỏ hàng`);
     } catch (err: any) {
-      console.error('Cart API error:', err);
+      console.error('Lỗi API giỏ hàng:', err);
       if (
         err.status === 401 ||
         err.error?.message === 'Không tìm thấy người dùng.'
       ) {
         this.auth.logout();
+        this.showLoginModal = true;
       } else {
         this.showToast('Lỗi khi thêm sản phẩm vào giỏ hàng');
       }
@@ -414,7 +458,7 @@ export class ShopComponent implements OnInit {
     const productName = product.variantName
       ? `${product.name} ${product.variantName}`
       : product.name;
-    console.log('Added to wishlist:', productName);
+    console.log('Đã thêm vào danh sách yêu thích:', productName);
     this.showToast(`${productName} đã được thêm vào danh sách yêu thích`);
   }
 
@@ -474,8 +518,7 @@ export class ShopComponent implements OnInit {
                 ? new Date(product.newFrom)
                 : null;
               const newTo = product.newTo ? new Date(product.newTo) : null;
-              let badge =
-                product.inStock === false ? 'Out of Stock' : undefined;
+              let badge = product.inStock === false ? 'Hết hàng' : undefined;
               let badgeColor = product.inStock === false ? 'danger' : 'success';
               if (
                 !badge &&
@@ -486,13 +529,13 @@ export class ShopComponent implements OnInit {
                 currentDate >= newFrom &&
                 currentDate <= newTo
               ) {
-                badge = 'New';
+                badge = 'Mới';
                 badgeColor = 'success';
               }
 
               return {
                 id: product.id || 0,
-                name: product.name || 'Unknown Product',
+                name: product.name || 'Sản phẩm không xác định',
                 minPrice: product.minPrice || 0,
                 maxPrice: product.maxPrice || product.minPrice || 0,
                 variantName,
@@ -512,6 +555,8 @@ export class ShopComponent implements OnInit {
                 inStock: product.inStock ?? true,
                 newFrom: product.newFrom || '',
                 newTo: product.newTo || '',
+                variants: product.variants || [],
+                variations: product.variations || [],
               };
             });
 
@@ -541,7 +586,7 @@ export class ShopComponent implements OnInit {
           this.cd.detectChanges();
         },
         error: (err) => {
-          console.error('API error:', err);
+          console.error('Lỗi API:', err);
           this.showToast('Lỗi khi lọc theo danh mục. Vui lòng thử lại.');
           this.filteredProducts = [];
           this.latestProducts = [];
@@ -562,5 +607,15 @@ export class ShopComponent implements OnInit {
       pages.push(i);
     }
     return pages;
+  }
+
+  goToProductDetail(id: number): void {
+    this.router.navigate(['/product-detail', id]);
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/home']);
+    this.showUserMenu = false;
   }
 }

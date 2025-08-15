@@ -1,0 +1,269 @@
+<div [attr.aria-label]="'Variants'" class="container" role="region">
+  <header>
+    <h2>Variants - {{ variant.name }}</h2>
+    <div [attr.aria-label]="'Variants controls'" class="icons" role="group">
+      <button
+        [attr.aria-label]="'Collapse variants section'"
+        title="Collapse"
+        type="button"
+        (click)="toggleCollapse()"
+      >
+        <i
+          class="fas"
+          [ngClass]="isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'"
+        ></i>
+      </button>
+      <button
+        [attr.aria-label]="'Variants view options'"
+        title="View options"
+        type="button"
+      >
+        <i class="fas fa-th"></i>
+      </button>
+    </div>
+  </header>
+  <section
+    [attr.aria-label]="variant.name + ' variant details'"
+    class="variant-section"
+    [ngClass]="{ collapsed: isCollapsed }"
+  >
+    <header
+      [attr.aria-controls]="variant.name + '-variant-details'"
+      [attr.aria-expanded]="!isCollapsed"
+      class="variant-header"
+    >
+      <div class="label-group">
+        <span>{{ variant.name }}</span>
+        <span class="default-badge" *ngIf="variant.isDefault">Default</span>
+      </div>
+      <input
+        [attr.aria-label]="'Toggle ' + variant.name + ' variant'"
+        [(ngModel)]="variant.isActive"
+        class="toggle-switch"
+        id="{{ variant.name }}-toggle"
+        type="checkbox"
+        name="isActive-{{ variant.name }}"
+      />
+    </header>
+
+    <div
+      class="variant-content"
+      id="{{ variant.name }}-variant-details"
+      *ngIf="!isCollapsed"
+    >
+      <div class="image-box">
+        <img
+          [src]="variant.imagePreview || '/images/placeholder_image.png'"
+          class="placeholder-image"
+          [attr.alt]="'Image for ' + variant.name"
+        />
+        <!-- <input type="file" (change)="onVariantImageSelected($event)" accept="image/*" /> -->
+      </div>
+
+      <div class="fields-grid">
+        <div class="col-4">
+          <div>
+            <label class="field-label required" for="sku-{{ variant.name }}"
+              >SKU</label
+            >
+            <input
+              id="sku-{{ variant.name }}"
+              name="sku-{{ variant.name }}"
+              type="text"
+              [(ngModel)]="variant.sku"
+              (ngModelChange)="onSkuChange()"
+              required
+              #skuInput="ngModel"
+            />
+            <div
+              *ngIf="skuInput.errors?.['required'] && skuInput.touched"
+              class="text-danger"
+            >
+              SKU is required
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label" for="special-price-{{ variant.name }}"
+              >Special Price</label
+            >
+            <div class="input-group">
+              <span class="prefix" style="height: 38px">$</span>
+              <input
+                id="special-price-{{ variant.name }}"
+                name="special-price-{{ variant.name }}"
+                type="number"
+                [(ngModel)]="variant.specialPrice"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="field-label"
+              for="special-price-start-{{ variant.name }}"
+              >Special Price Start</label
+            >
+            <div class="input-group date-group">
+              <span class="calendar-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </span>
+              <input
+                id="special-price-start-{{ variant.name }}"
+                name="special-price-start-{{ variant.name }}"
+                type="date"
+                [(ngModel)]="variant.specialPriceStart"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="field-label"
+              for="inventory-management-{{ variant.name }}"
+              >Inventory Management</label
+            >
+            <select
+              id="inventory-management-{{ variant.name }}"
+              name="inventory-management-{{ variant.name }}"
+              [(ngModel)]="variant.inventoryManagement"
+            >
+              <option value="Don't Track Inventory">
+                Don't Track Inventory
+              </option>
+              <option value="Track Inventory">Track Inventory</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="manage-stock-{{ variant.name }}"
+              >Manage Stock</label
+            >
+            <input
+              id="manage-stock-{{ variant.name }}"
+              name="manage-stock-{{ variant.name }}"
+              type="checkbox"
+              [(ngModel)]="variant.manageStock"
+            />
+          </div>
+        </div>
+
+        <div class="col-8">
+          <div>
+            <label class="field-label required" for="price-{{ variant.name }}"
+              >Price</label
+            >
+            <div class="input-group">
+              <span class="prefix" style="height: 38px">$</span>
+              <input
+                id="price-{{ variant.name }}"
+                name="price-{{ variant.name }}"
+                required
+                type="number"
+                [(ngModel)]="variant.price"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="field-label"
+              for="special-price-type-{{ variant.name }}"
+              >Special Price Type</label
+            >
+            <select
+              id="special-price-type-{{ variant.name }}"
+              name="special-price-type-{{ variant.name }}"
+              [(ngModel)]="variant.specialPriceType"
+            >
+              <option value="1">Fixed</option>
+              <option value="2">Percent</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              class="field-label"
+              for="special-price-end-{{ variant.name }}"
+              >Special Price End</label
+            >
+            <div class="input-group date-group">
+              <span class="calendar-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </span>
+              <input
+                id="special-price-end-{{ variant.name }}"
+                name="special-price-end-{{ variant.name }}"
+                type="date"
+                [(ngModel)]="variant.specialPriceEnd"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="field-label"
+              for="stock-availability-{{ variant.name }}"
+              >Stock Availability</label
+            >
+            <select
+              id="stock-availability-{{ variant.name }}"
+              name="stock-availability-{{ variant.name }}"
+              [(ngModel)]="variant.stockAvailability"
+            >
+              <option value="In Stock">In Stock</option>
+              <option value="Out of Stock">Out of Stock</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="selling-price-{{ variant.name }}"
+              >Selling Price</label
+            >
+            <div class="input-group">
+              <span class="prefix" style="height: 38px">$</span>
+              <input
+                id="selling-price-{{ variant.name }}"
+                name="selling-price-{{ variant.name }}"
+                type="number"
+                [(ngModel)]="variant.sellingPrice"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label required" for="qty-{{ variant.name }}"
+              >Quantity</label
+            >
+            <input
+              id="qty-{{ variant.name }}"
+              name="qty-{{ variant.name }}"
+              type="number"
+              [(ngModel)]="variant.qty"
+              required
+              #qtyInput="ngModel"
+            />
+            <div
+              *ngIf="qtyInput.errors?.['required'] && qtyInput.touched"
+              class="text-danger"
+            >
+              Quantity is required
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label" for="in-stock-{{ variant.name }}"
+              >In Stock</label
+            >
+            <input
+              id="in-stock-{{ variant.name }}"
+              name="in-stock-{{ variant.name }}"
+              type="checkbox"
+              [(ngModel)]="variant.inStock"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

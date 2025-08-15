@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../core/api/api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { CartService } from '../../ShoppingCart/cart.service';
+import { ShoppingcartComponent } from '../../ShoppingCart/shoppingcart.component';
 import { debounceTime, Subject } from 'rxjs';
 
 interface ApiProduct {
@@ -62,17 +63,18 @@ interface ApiProduct {
   templateUrl: 'detailproduct.component.html',
   styleUrls: ['detailproduct.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, ShoppingcartComponent],
 })
 export class ProductDetailComponent implements OnInit {
   apiProduct: ApiProduct | null = null;
-  product: any = {}; // Mapped for display
+  product: any = {};
   variants: any[] = [];
   selectedVariant: any = null;
   selectedVariantName: string = '';
   maxQuantity: number = Infinity;
   images: string[] = [];
   selectedImage = 0;
+  cartItems: number = 0;
   quantity = 1;
   activeTab = 'description';
   showSizeChart = false;
@@ -80,36 +82,37 @@ export class ProductDetailComponent implements OnInit {
   toastVisible: boolean = false;
   toastTimeout: ReturnType<typeof setTimeout> | null = null;
   showLoginModal: boolean = false;
-  variantLabel = 'Tùy chọn'; // mặc định
-  // Keep hardcoded parts that aren't in API
+  variantLabel = 'Tùy chọn';
+  isCartOpen: boolean = false;
+
   relatedProducts = [
     {
       name: 'DUDUALISS Men Long Sleeve Shirt Men...',
-      price: 17.3,
+      price: 173000,
       image: 'assets/images/related1.jpg',
       rating: 4,
     },
     {
       name: 'S-5XL Plus Size Brand Clothing Cotton Mens...',
-      price: 7.47,
+      price: 74700,
       image: 'assets/images/related2.jpg',
       rating: 4,
     },
     {
       name: '2019 brand casual spring luxury plaid lon...',
-      price: 5.24,
+      price: 52400,
       image: 'assets/images/related3.jpg',
       rating: 4,
     },
     {
       name: 'Long-sleeved Camisa Masculina Chamise...',
-      price: 9.69,
+      price: 96900,
       image: 'assets/images/related4.jpg',
       rating: 5,
     },
     {
       name: 'Europe size Summer Short Sleeve Solid Polo...',
-      price: 8.35,
+      price: 83500,
       image: 'assets/images/related5.jpg',
       rating: 4,
     },
@@ -133,9 +136,10 @@ export class ProductDetailComponent implements OnInit {
       }
     });
 
-    if (this.variants?.length > 0 && this.variants[0].type) {
-      this.variantLabel = this.variants[0].type;
-    }
+    this.cartService.cart$.subscribe((cart) => {
+      this.cartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      this.cd.detectChanges();
+    });
   }
 
   fetchProduct(id: string): void {
@@ -152,7 +156,7 @@ export class ProductDetailComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('API error:', err);
+          console.error('Lỗi API:', err);
           this.showToast('Lỗi khi tải thông tin sản phẩm.');
         },
       });
@@ -169,20 +173,14 @@ export class ProductDetailComponent implements OnInit {
       this.apiProduct.gallery?.map((g) => baseUrl + g.replace(/\\/g, '/')) ||
       [];
 
-    // Danh sách ảnh
     this.images = thumbnail ? [thumbnail, ...gallery] : [...gallery];
-
-    // Lấy danh sách biến thể
     this.variants = this.apiProduct.variants || [];
 
-    // Gán biến thể mặc định + label
     if (this.variants.length > 0) {
       this.selectedVariant = this.variants[0];
       this.selectedVariantName = this.selectedVariant.name;
       if (this.apiProduct.variations?.length > 0) {
         this.variantLabel = this.apiProduct.variations[0].name;
-      } else {
-        this.variantLabel = 'Tùy chọn';
       }
     }
 
@@ -199,11 +197,11 @@ export class ProductDetailComponent implements OnInit {
       reviews: 0,
       tags: [],
       features: [
-        '24/7 SUPPORT - Support every time',
-        'ACCEPT PAYMENT - Visa, Paypal, Master',
-        'SECURED PAYMENT - 100% Secured',
-        'FREE SHIPPING - Order over 100K',
-        '30 DAYS RETURN - 30 days guarantee',
+        'HỖ TRỢ 24/7 - Hỗ trợ mọi lúc',
+        'CHẤP NHẬN THANH TOÁN - Visa, Paypal, Master',
+        'THANH TOÁN AN TOÀN - Bảo mật 100%',
+        'MIỄN PHÍ GIAO HÀNG - Đơn hàng trên 100K',
+        'ĐỔI TRẢ 30 NGÀY - Đảm bảo 30 ngày',
       ],
       warranty: 'Bảo hành theo nhà sản xuất',
       images: this.images,
@@ -225,6 +223,22 @@ export class ProductDetailComponent implements OnInit {
       this.maxQuantity = this.selectedVariant.manageStock
         ? this.selectedVariant.qty
         : Infinity;
+      this.selectedVariantName = this.selectedVariant.name;
+      if (this.quantity > this.maxQuantity) {
+        this.quantity = this.maxQuantity;
+      }
+    } else {
+      this.product.price = this.apiProduct?.minPrice || 0;
+      this.product.originalPrice = null;
+      this.product.inStock = this.apiProduct?.inStock || false;
+      this.product.sku = this.apiProduct?.sku || '';
+      this.maxQuantity = this.apiProduct?.manageStock
+        ? this.apiProduct.qty
+        : Infinity;
+      this.selectedVariantName = '';
+      if (this.quantity > this.maxQuantity) {
+        this.quantity = this.maxQuantity;
+      }
     }
   }
 
@@ -238,21 +252,23 @@ export class ProductDetailComponent implements OnInit {
   }
 
   async addToCart() {
-    if (!this.selectedVariant) {
+    if (this.variants.length > 0 && !this.selectedVariant) {
       this.showToast('Vui lòng chọn biến thể sản phẩm.');
       return;
     }
 
-    if (this.selectedVariant.inStock === false) {
+    if (this.product.inStock === false) {
       this.showToast(
-        `${this.product.name} (${this.selectedVariantName}) hiện đã hết hàng`
+        `${this.product.name}${
+          this.selectedVariantName ? ` (${this.selectedVariantName})` : ''
+        } hiện đã hết hàng`
       );
       return;
     }
 
     const accessToken = this.auth.getAccessToken();
     if (!accessToken) {
-      this.router.navigate(['/login']);
+      this.showLoginModal = true;
       return;
     }
 
@@ -260,13 +276,13 @@ export class ProductDetailComponent implements OnInit {
     if (!isValid) {
       const refreshed = await this.auth.refreshToken();
       if (!refreshed) {
-        this.auth.logout();
+        this.showLoginModal = true;
         return;
       }
       isValid = await this.auth.isAccessTokenValid();
       if (!isValid) {
         this.showToast('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-        this.auth.logout();
+        this.showLoginModal = true;
         return;
       }
     }
@@ -277,35 +293,51 @@ export class ProductDetailComponent implements OnInit {
       quantity: this.quantity,
       minPrice: this.apiProduct!.minPrice,
       maxPrice: this.apiProduct!.maxPrice,
-      variantName: this.selectedVariant.name,
-      variantId: this.selectedVariant.id,
-      variantType: this.selectedVariant.type,
-      price: this.selectedVariant.sellingPrice,
-      image: this.images[0],
+      variantName: this.selectedVariant ? this.selectedVariant.name : '',
+      variantId: this.selectedVariant ? this.selectedVariant.id : null,
+      price: this.selectedVariant
+        ? this.selectedVariant.sellingPrice
+        : this.apiProduct!.minPrice,
+      image: this.images[0] || 'assets/placeholder.jpg',
       updatedAt: this.apiProduct!.updatedAt,
       categories: this.apiProduct!.categories,
-      isActive: this.selectedVariant.isActive,
-      inStock: this.selectedVariant.inStock,
+      isActive: this.selectedVariant
+        ? this.selectedVariant.isActive
+        : this.apiProduct!.isActive,
+      inStock: this.selectedVariant
+        ? this.selectedVariant.inStock
+        : this.apiProduct!.inStock,
       newFrom: this.apiProduct!.newFrom,
       newTo: this.apiProduct!.newTo,
+      variants: this.apiProduct!.variants,
+      variations: this.apiProduct!.variations,
     };
 
     try {
       await this.cartService.addToCart(cartProduct);
       this.showToast(
-        `${this.product.name} (${this.selectedVariantName}) đã được thêm vào giỏ hàng`
+        `${this.product.name}${
+          this.selectedVariantName ? ` (${this.selectedVariantName})` : ''
+        } đã được thêm vào giỏ hàng`
       );
+      this.isCartOpen = true; // Mở giỏ hàng sau khi thêm sản phẩm
     } catch (err: any) {
-      console.error('Cart API error:', err);
+      console.error('Lỗi API giỏ hàng:', err);
       if (
         err.status === 401 ||
         err.error?.message === 'Không tìm thấy người dùng.'
       ) {
         this.auth.logout();
+        this.showLoginModal = true;
       } else {
         this.showToast('Lỗi khi thêm sản phẩm vào giỏ hàng');
       }
     }
+    this.cd.detectChanges();
+  }
+
+  closeCart(): void {
+    this.isCartOpen = false;
     this.cd.detectChanges();
   }
 
@@ -318,7 +350,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   shareProduct(platform: string) {
-    console.log('Sharing on', platform);
+    console.log('Chia sẻ trên', platform);
+    this.showToast(`Chia sẻ sản phẩm trên ${platform}`);
   }
 
   getStars(rating: number): string[] {
@@ -348,5 +381,16 @@ export class ProductDetailComponent implements OnInit {
   formatPrice(value: number): string {
     if (value == null) return '';
     return value.toLocaleString('vi-VN');
+  }
+
+  confirmLogin(): void {
+    this.showLoginModal = false;
+    this.router.navigate(['/login']);
+    this.cd.detectChanges();
+  }
+
+  cancelLogin(): void {
+    this.showLoginModal = false;
+    this.cd.detectChanges();
   }
 }

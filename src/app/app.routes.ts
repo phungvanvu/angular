@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { LayoutComponent } from './admin/components/layout/layout.component';
 import { DashboardComponent } from './admin/components/dashboard/dashboard.component';
 import { CreatProductComponent } from './Product/creat_product/creat_product.component';
-import { ProductsComponent } from './Product/product.component';
+import { ProductComponent } from './Product/product.component';
 import { BrandsComponent } from './Brand/brands.component';
 import { CreatBrandsComponent } from './Brand/creat_brand/creat_brand.component';
 import { CreateImageComponent } from './admin/components/upload/create_image.component';
@@ -16,6 +16,7 @@ import { FashionComponent } from './User/Menfashion/fashion.component';
 import { ShopComponent } from './User/Shop/shop.component';
 import { CheckoutComponent } from './User/Order/CheckOut/checkout.component';
 import { OrderCompleteComponent } from './User/Order/OrderComplete/order-complete.component';
+import { CategoryComponent } from './Category/category.component';
 
 export const routes: Routes = [
   //User
@@ -41,7 +42,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       // Products
       { path: 'admin-products-create', component: CreatProductComponent },
-      { path: 'app-products', component: ProductsComponent },
+      { path: 'edit-product/:id', component: CreatProductComponent },
+      { path: 'app-products', component: ProductComponent },
 
       // Brands
       { path: 'app-brands', component: BrandsComponent },
@@ -53,8 +55,10 @@ export const routes: Routes = [
       // Variations
       { path: 'variations', component: VariationsComponent },
       { path: 'create_variation', component: CreateVariationComponent },
+      // Category
+      { path: 'category', component: CategoryComponent },
     ],
   },
 
-  { path: '**', redirectTo: 'login' },
+  { path: '**', redirectTo: 'home' },
 ];

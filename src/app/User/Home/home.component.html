@@ -23,6 +23,7 @@
             USD
             <mat-icon>arrow_drop_down</mat-icon>
           </button>
+          <!-- Nếu chưa login -->
           <button
             class="header-link"
             type="button"
@@ -31,6 +32,17 @@
           >
             <mat-icon>person</mat-icon>
             Login/Register
+          </button>
+
+          <!-- Nếu đã login -->
+          <button
+            class="header-link"
+            type="button"
+            (click)="logout()"
+            *ngIf="accessToken"
+          >
+            <mat-icon>logout</mat-icon>
+            Logout
           </button>
         </div>
       </div>

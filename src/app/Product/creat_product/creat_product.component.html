@@ -1,379 +1,651 @@
 <div class="product-form-wrapper">
-  <h3 class="product-form-title">Create Product</h3>
-  <div class="row">
-    <!-- Bên trái: Nội dung -->
-    <div class="col-md-8">
-      <div class="product-form-section">
-        <h3>General</h3>
-        <div class="form-group mb-3">
-          <label for="name">Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="name" />
+  <h3 class="product-form-title">
+    {{ isEditMode ? "Edit Product" : "Create Product" }}
+  </h3>
+  <form #productForm="ngForm">
+    <div class="row">
+      <!-- Bên trái: Nội dung -->
+      <div class="col-md-8">
+        <div class="product-form-section">
+          <h3>General</h3>
+          <div class="form-group mb-3">
+            <label for="name">Name <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              [(ngModel)]="name"
+              name="name"
+              required
+              #nameInput="ngModel"
+            />
+            <div
+              *ngIf="productForm.submitted && nameInput.errors?.['required']"
+              class="text-danger"
+            >
+              Name is required
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="editor">Description</label>
+            <editor
+              apiKey="cfy8qxfif7xhurpo8wuiw0jygns85n4xv0sov5nbzu4n82d0"
+              id="editor"
+              [(ngModel)]="htmlContent"
+              name="description"
+              [init]="{
+                height: 300,
+                menubar: false,
+                plugins: [
+                  'advlist',
+                  'autolink',
+                  'lists',
+                  'link',
+                  'image',
+                  'charmap',
+                  'preview',
+                  'anchor',
+                  'searchreplace',
+                  'visualblocks',
+                  'code',
+                  'fullscreen',
+                  'insertdatetime',
+                  'media',
+                  'table',
+                  'help',
+                  'wordcount',
+                  'quickbars'
+                ],
+                toolbar:
+                  'undo redo | formatselect | bold italic underline forecolor backcolor | ' +
+                  'alignleft aligncenter alignright alignjustify | ' +
+                  'bullist numlist outdent indent | code fullscreen',
+                quickbars_insert_toolbar: 'image table',
+                quickbars_selection_toolbar: 'bold italic link',
+                contextmenu: false
+              }"
+            ></editor>
+          </div>
+          <div class="form-group mb-3">
+            <label for="brand">Brand <span class="text-danger">*</span></label>
+            <select
+              id="brand"
+              class="form-select"
+              [(ngModel)]="brandId"
+              name="brandId"
+              required
+              #brandInput="ngModel"
+            >
+              <option value="">Please Select</option>
+              <option *ngFor="let brand of brands" [value]="brand.id">
+                {{ brand.name }}
+              </option>
+            </select>
+            <div
+              *ngIf="productForm.submitted && brandInput.errors?.['required']"
+              class="text-danger"
+            >
+              Brand is required
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="category"
+              >Category <span class="text-danger">*</span></label
+            >
+            <select
+              id="category"
+              class="form-select"
+              [(ngModel)]="categoryId"
+              name="categoryId"
+              required
+              #categoryInput="ngModel"
+            >
+              <option value="">Please Select</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+            <div
+              *ngIf="productForm.submitted && categoryInput.errors?.['required']"
+              class="text-danger"
+            >
+              Category is required
+            </div>
+          </div>
         </div>
 
-        <div class="form-group mb-3">
-          <label for="editor">Description</label>
-          <editor
-            apiKey="cfy8qxfif7xhurpo8wuiw0jygns85n4xv0sov5nbzu4n82d0"
-            id="editor"
-            [init]="{
-              height: 300,
-              menubar: false,
-              plugins: [
-                'advlist',
-                'autolink',
-                'lists',
-                'link',
-                'image',
-                'charmap',
-                'preview',
-                'anchor',
-                'searchreplace',
-                'visualblocks',
-                'code',
-                'fullscreen',
-                'insertdatetime',
-                'media',
-                'table',
-                'help',
-                'wordcount',
-                'quickbars'
-              ],
-              toolbar:
-                'undo redo | formatselect | bold italic underline forecolor backcolor | ' +
-                'alignleft aligncenter alignright alignjustify | ' +
-                'bullist numlist outdent indent |  code fullscreen',
-              quickbars_insert_toolbar: 'image table',
-              quickbars_selection_toolbar: 'bold italic link',
-              contextmenu: false
-            }"
-          ></editor>
-        </div>
-
-        <div class="form-group mb-3">
-          <label for="brand">Brand <span class="text-danger">*</span></label>
-          <select id="brand" class="form-select">
-            <option>Please Select</option>
-          </select>
-        </div>
-        <div class="form-group mb-3">
-          <label for="categories"
-            >Categories <span class="text-danger">*</span></label
-          >
-          <select id="categories" class="form-select">
-            <option>Please Select</option>
-          </select>
-        </div>
-        <div class="form-group mb-3">
-          <label for="taxclass"
-            >Tax Class <span class="text-danger">*</span></label
-          >
-          <select id="taxclass" class="form-select">
-            <option>Please Select</option>
-          </select>
-        </div>
-        <div class="form-group mb-3">
-          <label for="tags">Tags <span class="text-danger">*</span></label>
-          <select id="tags" class="form-select">
-            <option>Please Select</option>
-          </select>
-        </div>
         <div class="form-group mb-3">
           <label class="form-label" for="enableProduct">
             Status <span class="text-danger">*</span>
           </label>
           <label class="custom-switch">
-            <input type="checkbox" id="enableProduct" checked />
+            <input
+              type="checkbox"
+              id="enableProduct"
+              [(ngModel)]="isActive"
+              name="isActive"
+              checked
+            />
             <span class="slider"></span>
             <span class="switch-label">Enable the product</span>
           </label>
         </div>
-      </div>
-      <!-- Attributes -->
-      <div class="attribute-box">
-        <h3>Attributes</h3>
-        <hr class="attribute-divider" />
-        <div class="attribute-table">
-          <div class="attribute-table-header">
-            <span>Attribute</span>
-            <span>Values</span>
-          </div>
-          <div class="attribute-row">
-            <span class="material-icons drag-icon">drag_indicator</span>
-            <select class="form-control">
-              <option>Please Select</option>
-            </select>
 
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Enter attribute values"
-            />
-
-            <button type="button" class="delete-icon">
-              <i class="fas fa-trash-alt text-danger"></i>
-            </button>
-          </div>
-        </div>
-        <button type="button" class="btn btn-sm btn-light mt-2">
-          Add Attribute
-        </button>
-      </div>
-
-      <!-- Variation -->
-      <div class="product-form-section mt-4">
-        <h3>Variations</h3>
-        <hr class="section-divider" />
-        <div class="card">
-          <div
-            class="card-header d-flex justify-content-between align-items-center bg-light"
-          >
-            <span class="d-inline-flex align-items-center">
-              <i class="material-icons me-1">drag_indicator</i>
-              <span style="position: relative; top: -6px">New Variation</span>
-            </span>
-            <button
-              type="button"
-              style="background: none; border: none; padding: 0"
+        <!-- Variation -->
+        <div class="product-form-section mt-4">
+          <h3>Variations</h3>
+          <hr class="section-divider" />
+          <div class="card" *ngFor="let variation of variations; let i = index">
+            <div
+              class="card-header d-flex justify-content-between align-items-center bg-light"
             >
-              <i class="fas fa-trash-alt text-danger"></i>
-            </button>
-          </div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="variationName">Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="variationName"
-                  placeholder="Enter variation name"
-                />
+              <span class="d-inline-flex align-items-center">
+                <i class="material-icons me-1">drag_indicator</i>
+                <span style="position: relative; top: -6px">{{
+                  variation.name || "New Variation"
+                }}</span>
+              </span>
+              <button
+                type="button"
+                style="background: none; border: none; padding: 0"
+                (click)="removeVariation(i)"
+              >
+                <i class="fas fa-trash-alt text-danger"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="variationName{{ i }}"
+                    >Name <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="variationName{{ i }}"
+                    placeholder="Enter variation name"
+                    [(ngModel)]="variations[i].name"
+                    [name]="'variationName' + i"
+                    (ngModelChange)="updateVariants()"
+                    required
+                    #variationNameInput="ngModel"
+                  />
+                  <div
+                    *ngIf="productForm.submitted && variationNameInput.errors?.['required']"
+                    class="text-danger"
+                  >
+                    Variation name is required
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="variationType{{ i }}"
+                    >Type <span class="text-danger">*</span></label
+                  >
+                  <select
+                    class="form-control"
+                    id="variationType{{ i }}"
+                    [(ngModel)]="variations[i].type"
+                    [name]="'variationType' + i"
+                    (change)="onTypeChange(i)"
+                    required
+                    #variationTypeInput="ngModel"
+                  >
+                    <option value="">Please Select</option>
+                    <option value="Text">Text</option>
+                    <option value="Color">Color</option>
+                  </select>
+                  <div
+                    *ngIf="productForm.submitted && variationTypeInput.errors?.['required']"
+                    class="text-danger"
+                  >
+                    Variation type is required
+                  </div>
+                </div>
               </div>
-
-              <div class="form-group col-md-6">
-                <label for="variationType">Type</label>
-                <select class="form-control" id="variationType">
-                  <option>Please Select</option>
-                  <option>Color</option>
-                  <option>Size</option>
-                  <option>Material</option>
-                </select>
+              <div
+                *ngIf="
+                  variations[i].type === 'Text' ||
+                  variations[i].type === 'Color'
+                "
+              >
+                <table class="values-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Label <span class="required">*</span></th>
+                      <th *ngIf="variations[i].type === 'Color'">
+                        Color <span class="required">*</span>
+                      </th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="
+                        let value of variations[i].values;
+                        let rowIndex = index
+                      "
+                    >
+                      <td class="drag-icon">
+                        <i class="material-icons drag-icon">drag_indicator</i>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          [(ngModel)]="value.label"
+                          placeholder="Enter label"
+                          [name]="'variationLabel' + i + '_' + rowIndex"
+                          (ngModelChange)="updateVariants()"
+                          required
+                          #variationLabelInput="ngModel"
+                        />
+                        <input
+                          type="hidden"
+                          [(ngModel)]="value.value"
+                          [name]="'variationValue' + i + '_' + rowIndex"
+                        />
+                        <div
+                          *ngIf="productForm.submitted && variationLabelInput.errors?.['required']"
+                          class="text-danger"
+                        >
+                          Label is required
+                        </div>
+                      </td>
+                      <td *ngIf="variations[i].type === 'Color'">
+                        <div class="color-group">
+                          <input
+                            type="text"
+                            [(ngModel)]="value.color"
+                            placeholder=""
+                            [name]="'variationColorText' + i + '_' + rowIndex"
+                            (ngModelChange)="updateVariants()"
+                          />
+                          <input
+                            type="color"
+                            [(ngModel)]="value.color"
+                            [name]="'variationColorPicker' + i + '_' + rowIndex"
+                            (ngModelChange)="updateVariants()"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn-delete"
+                          (click)="removeRow(i, rowIndex)"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button class="btn-add-row" (click)="addRow(i)">Add Row</button>
               </div>
             </div>
           </div>
-        </div>
-        <div class="variation-actions">
-          <button class="btn btn-secondary">Add Variation</button>
-          <div style="display: flex; gap: 0.5rem">
-            <select class="form-control" style="width: 160px">
-              <option>Select Template</option>
-            </select>
-            <button
-              class="btn btn-light"
-              disabled
-              style="position: relative; top: -11px"
-            >
-              Insert
+          <div class="variation-actions">
+            <button class="btn btn-secondary" (click)="addVariation()">
+              Add Variation
             </button>
+            <div style="display: flex; gap: 0.5rem">
+              <select
+                class="form-control"
+                style="width: 160px"
+                [(ngModel)]="selectedTemplateId"
+                name="selectedTemplate"
+              >
+                <option [ngValue]="null">Select Template</option>
+                <option
+                  *ngFor="let template of variationTemplates"
+                  [ngValue]="template.id"
+                >
+                  {{ template.name }}
+                </option>
+              </select>
+              <button
+                class="btn btn-light"
+                [disabled]="selectedTemplateId === null"
+                (click)="insertVariation()"
+                style="position: relative; top: -11px"
+              >
+                Insert
+              </button>
+            </div>
           </div>
+        </div>
+
+        <!-- Variants Section -->
+        <div class="product-form-section mt-4">
+          <h3>Variants</h3>
+          <hr class="section-divider" />
+          <ng-container *ngIf="variants.length > 0; else noVariantsMessage">
+            <div class="form-group mb-3">
+              <label>Default Variant</label>
+              <select
+                class="form-select"
+                [(ngModel)]="defaultVariantName"
+                name="defaultVariantName"
+                (ngModelChange)="setDefaultVariant()"
+              >
+                <option *ngFor="let variant of variants" [value]="variant.name">
+                  {{ variant.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group mb-3">
+              <label>Bulk Edit</label>
+              <select class="form-select" name="bulkEdit">
+                <option>Please Select</option>
+              </select>
+            </div>
+
+            <ng-container *ngIf="showVariantsSection">
+              <variant
+                *ngFor="let v of variants"
+                [variant]="v"
+                [variants]="variants"
+                [(defaultVariantName)]="defaultVariantName"
+                (variantChange)="updateVariant($event)"
+              ></variant>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #noVariantsMessage>
+            <div class="variants-message">
+              <div class="message-box">
+                <i class="fas fa-exclamation-circle message-icon"></i>
+                Please add some variations to generate variants
+              </div>
+            </div>
+          </ng-template>
         </div>
       </div>
-    </div>
-    <!-- Bên phải: Media và Pricing -->
-    <div class="product-form-right-column col-lg-4 col-md-12">
-      <div class="product-form-column" data-name="product-form-right-sections">
-        <!-- Media -->
-        <div class="box mb-3" data-draggable="true">
-          <div class="box-header">
-            <h3>Media</h3>
-          </div>
-          <div class="box-body">
-            <div class="row">
-              <div class="col-md-12">
+
+      <!-- Bên phải: Media và Pricing -->
+      <div class="product-form-right-column col-lg-4 col-md-12">
+        <div
+          class="product-form-column"
+          data-name="product-form-right-sections"
+        >
+          <!-- Media Section -->
+          <div class="box mb-3" data-draggable="true">
+            <div class="box-header">
+              <h3>Media</h3>
+            </div>
+            <div class="box-body">
+              <!-- Thumbnail -->
+              <div class="image-block mb-3">
+                <label>Thumbnail <span class="text-danger">*</span></label>
+                <button
+                  type="button"
+                  class="btn-browse"
+                  (click)="openFileManager('thumbnail')"
+                >
+                  <i class="fas fa-folder-open"></i> Browse
+                </button>
+                <div class="image-preview">
+                  <img
+                    *ngIf="thumbnailPreview"
+                    [src]="thumbnailPreview"
+                    alt="Thumbnail Preview"
+                    class="thumbnail-image"
+                  />
+                  <i *ngIf="!thumbnailPreview" class="fas fa-image"></i>
+                </div>
+              </div>
+
+              <!-- Gallery -->
+              <div class="image-block">
+                <label>Gallery Images</label>
+                <button
+                  type="button"
+                  class="btn-browse"
+                  (click)="openFileManager('gallery')"
+                >
+                  <i class="fas fa-folder-open"></i> Add Image
+                </button>
                 <div class="product-media-grid">
-                  <div class="media-grid-item media-picker disabled">
+                  <div
+                    class="media-grid-item"
+                    *ngFor="let image of galleryPreviews; let i = index"
+                  >
                     <div class="image-holder">
-                      <img
-                        src="/images/placeholder_image.png"
-                        class="placeholder-image"
-                        alt="Image from public"
-                      />
+                      <img [src]="image.url" alt="Gallery Image" />
+                      <button
+                        type="button"
+                        class="btn-delete"
+                        (click)="removeGalleryImage(i)"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Pricing -->
-        <div class="box mt-3" data-draggable="true">
-          <div class="box-header">
-            <h3>Pricing</h3>
+          <!-- Pricing -->
+          <div class="box mt-3" data-draggable="true">
+            <div class="box-header">
+              <h3>Pricing</h3>
+            </div>
+            <div class="box-body">
+              <div class="form-group">
+                <label for="price"
+                  >Price <span class="text-danger">*</span></label
+                >
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol">$</span>
+                  <input
+                    type="number"
+                    class="form-control custom-input"
+                    id="price"
+                    placeholder="Enter price"
+                    [(ngModel)]="price"
+                    name="price"
+                    required
+                    #priceInput="ngModel"
+                  />
+                  <div
+                    *ngIf="productForm.submitted && priceInput.errors?.['required']"
+                    class="text-danger"
+                  >
+                    Price is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="specialPrice">Special Price</label>
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol">$</span>
+                  <input
+                    type="number"
+                    class="form-control custom-input"
+                    id="specialPrice"
+                    placeholder="Enter special price"
+                    [(ngModel)]="specialPrice"
+                    name="specialPrice"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="specialPriceType">Special Price Type</label>
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol">%</span>
+                  <select
+                    id="specialPriceType"
+                    class="form-control custom-input"
+                    [(ngModel)]="specialPriceType"
+                    name="specialPriceType"
+                  >
+                    <option value="1">Fixed</option>
+                    <option value="2">Percent</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="specialPriceStart">Special Price Start</label>
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol"
+                    ><i class="fa fa-calendar"></i
+                  ></span>
+                  <input
+                    type="date"
+                    class="form-control custom-input"
+                    id="specialPriceStart"
+                    [(ngModel)]="specialPriceStart"
+                    name="specialPriceStart"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="specialPriceEnd">Special Price End</label>
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol"
+                    ><i class="fa fa-calendar"></i
+                  ></span>
+                  <input
+                    type="date"
+                    class="form-control custom-input"
+                    id="specialPriceEnd"
+                    [(ngModel)]="specialPriceEnd"
+                    name="specialPriceEnd"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="box-body">
-            <!-- Price -->
-            <div class="form-group">
-              <label for="price"
-                >Price <span class="text-danger">*</span></label
-              >
-              <div class="custom-input-group">
-                <span class="custom-input-symbol">$</span>
+
+          <!-- Inventory -->
+          <div class="box mt-3" data-draggable="true">
+            <div class="box-header">
+              <h3>Inventory</h3>
+            </div>
+            <div class="box-body">
+              <div class="form-group">
+                <label for="sku">SKU</label>
                 <input
-                  type="number"
-                  class="form-control custom-input"
-                  id="price"
-                  placeholder="Enter price"
+                  type="text"
+                  class="form-control"
+                  id="sku"
+                  placeholder="Enter SKU"
+                  [(ngModel)]="sku"
+                  name="sku"
                 />
               </div>
-            </div>
 
-            <!-- Special Price -->
-            <div class="form-group">
-              <label for="specialPrice">Special Price</label>
-              <div class="custom-input-group">
-                <span class="custom-input-symbol">$</span>
-                <input
-                  type="number"
-                  class="form-control custom-input"
-                  id="specialPrice"
-                  placeholder="Enter special price"
-                />
+              <div class="form-group">
+                <label for="inventoryManagement">Inventory Management</label>
+                <select
+                  id="inventoryManagement"
+                  class="form-select"
+                  [(ngModel)]="inventoryManagement"
+                  name="inventoryManagement"
+                >
+                  <option value="Don't Track Inventory">
+                    Don't Track Inventory
+                  </option>
+                  <option value="Track Inventory">Track Inventory</option>
+                </select>
               </div>
-            </div>
 
-            <!-- Special Price Type -->
-            <div class="form-group">
-              <label for="specialPriceType">Special Price Type</label>
-              <div class="custom-input-group">
-                <span class="custom-input-symbol">%</span>
-                <select id="specialPriceType" class="form-control custom-input">
-                  <option value="fixed">Fixed</option>
-                  <option value="percent">Percent</option>
+              <div class="form-group">
+                <label for="stockAvailability">Stock Availability</label>
+                <select
+                  id="stockAvailability"
+                  class="form-select"
+                  [(ngModel)]="stockAvailability"
+                  name="stockAvailability"
+                >
+                  <option value="In Stock">In Stock</option>
+                  <option value="Out of Stock">Out of Stock</option>
                 </select>
               </div>
             </div>
+          </div>
 
-            <!-- Special Price Start -->
-            <div class="form-group">
-              <label for="specialPriceStart">Special Price Start</label>
-              <div class="custom-input-group">
-                <span class="custom-input-symbol"
-                  ><i class="fa fa-calendar"></i
-                ></span>
-                <input
-                  type="date"
-                  class="form-control custom-input"
-                  id="specialPriceStart"
-                />
+          <!-- Additional -->
+          <div class="box mt-3" data-draggable="true">
+            <div class="box-header">
+              <h3>Additional</h3>
+            </div>
+            <div class="box-body">
+              <div class="form-group">
+                <label for="short-description">Short Description</label>
+                <textarea
+                  class="form-control"
+                  id="short-description"
+                  placeholder="Enter short description"
+                  [(ngModel)]="shortDescription"
+                  name="shortDescription"
+                ></textarea>
               </div>
-            </div>
-
-            <!-- Special Price End -->
-            <div class="form-group">
-              <label for="specialPriceEnd">Special Price End</label>
-              <div class="custom-input-group">
-                <span class="custom-input-symbol"
-                  ><i class="fa fa-calendar"></i
-                ></span>
-                <input
-                  type="date"
-                  class="form-control custom-input"
-                  id="specialPriceEnd"
-                />
+              <div class="form-group">
+                <label for="newFrom">New From</label>
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol"
+                    ><i class="fa fa-calendar"></i
+                  ></span>
+                  <input
+                    type="date"
+                    class="form-control custom-input"
+                    id="newFrom"
+                    [(ngModel)]="newFrom"
+                    name="newFrom"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-        <!-- INVENTORY BOX -->
-        <div class="box" data-draggable="true">
-          <div class="box-header">
-            <h3>Inventory</h3>
-          </div>
-          <div class="box-body">
-            <!-- SKU -->
-            <div class="form-group">
-              <label for="sku">SKU</label>
-              <input
-                type="text"
-                class="form-control"
-                id="sku"
-                placeholder="Enter SKU"
-              />
-            </div>
-
-            <!-- Inventory Management -->
-            <div class="form-group">
-              <label for="inventoryManagement">Inventory Management</label>
-              <select id="inventoryManagement" class="form-select">
-                <option value="no-track">Don't Track Inventory</option>
-                <option value="track">Track Inventory</option>
-              </select>
-            </div>
-
-            <!-- Stock Availability -->
-            <div class="form-group">
-              <label for="stockAvailability">Stock Availability</label>
-              <select id="stockAvailability" class="form-select">
-                <option value="in-stock">In Stock</option>
-                <option value="out-of-stock">Out of Stock</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <!-- Additional -->
-        <div class="box" data-draggable="true">
-          <div class="box-header">
-            <h3>Additional</h3>
-          </div>
-          <div class="box-body">
-            <!-- Short Description -->
-            <div class="form-group">
-              <label for="short-description">Short Description</label>
-              <textarea
-                class="form-control"
-                id="short-description"
-                placeholder="Enter short description"
-              ></textarea>
-            </div>
-            <!-- New From -->
-            <div class="form-group">
-              <label for="specialPriceStart">New From</label>
-              <div class="custom-input-group">
-                <span class="custom-input-symbol"
-                  ><i class="fa fa-calendar"></i
-                ></span>
-                <input
-                  type="date"
-                  class="form-control custom-input"
-                  id="specialPriceStart"
-                />
-              </div>
-            </div>
-
-            <!-- New To -->
-            <div class="form-group">
-              <label for="specialPriceEnd">New To</label>
-              <div class="custom-input-group">
-                <span class="custom-input-symbol"
-                  ><i class="fa fa-calendar"></i
-                ></span>
-                <input
-                  type="date"
-                  class="form-control custom-input"
-                  id="specialPriceEnd"
-                />
+              <div class="form-group">
+                <label for="newTo">New To</label>
+                <div class="custom-input-group">
+                  <span class="custom-input-symbol"
+                    ><i class="fa fa-calendar"></i
+                  ></span>
+                  <input
+                    type="date"
+                    class="form-control custom-input"
+                    id="newTo"
+                    [(ngModel)]="newTo"
+                    name="newTo"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="fixed-footer">
-    <div class="footer-actions">
-      <button class="btn btn-outline-dark save-button">Save</button>
-      <button class="btn btn-primary ms-2 save-exit-button">Save & Exit</button>
+
+    <!-- File Manager Modal -->
+    <create_image
+      *ngIf="showFileManager"
+      [entityId]="editProductId"
+      [zone]="selectedZone"
+      (fileInserted)="onFileInserted($event)"
+      (close)="showFileManager = false"
+    ></create_image>
+
+    <div class="fixed-footer">
+      <div class="footer-actions">
+        <button class="btn btn-outline-dark save-button" (click)="onSave()">
+          Save
+        </button>
+        <button
+          class="btn btn-primary ms-2 save-exit-button"
+          (click)="onSaveAndExit()"
+        >
+          Save & Exit
+        </button>
+      </div>
     </div>
-  </div>
+  </form>
 </div>

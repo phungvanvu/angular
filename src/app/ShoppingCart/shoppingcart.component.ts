@@ -27,6 +27,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
 
   cart: { product: Product; quantity: number }[] = [];
   subtotal: number = 0;
+  cartItemCount: number = 0; // Thêm biến để lưu tổng quantity
 
   loading: boolean = true;
   error: string = '';
@@ -44,6 +45,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.cartService.cart$.subscribe((cart) => {
       this.cart = cart;
+      this.cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
       this.cd.detectChanges();
     });
 
@@ -77,7 +79,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
         : item.product.name;
       this.showToast(`Đã tăng số lượng ${productName}`);
     } catch (err) {
-      console.error('Increase quantity error:', err);
+      console.error('Lỗi khi tăng số lượng:', err);
       this.showToast('Lỗi khi cập nhật số lượng');
       this.cd.detectChanges();
     }
@@ -96,7 +98,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
         : item.product.name;
       this.showToast(`Đã giảm số lượng ${productName}`);
     } catch (err) {
-      console.error('Decrease quantity error:', err);
+      console.error('Lỗi khi giảm số lượng:', err);
       this.showToast('Lỗi khi cập nhật số lượng');
       this.cd.detectChanges();
     }
@@ -115,7 +117,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
         : item.product.name;
       this.showToast(`Đã xóa ${productName} khỏi giỏ hàng`);
     } catch (err) {
-      console.error('Remove item error:', err);
+      console.error('Lỗi khi xóa sản phẩm:', err);
       this.showToast('Lỗi khi xóa sản phẩm');
       this.cd.detectChanges();
     }
@@ -128,7 +130,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
       await this.cartService.clearCart();
       this.showToast('Đã xóa toàn bộ giỏ hàng');
     } catch (err) {
-      console.error('Clear cart error:', err);
+      console.error('Lỗi khi xóa giỏ hàng:', err);
       this.showToast('Lỗi khi xóa giỏ hàng');
       this.cd.detectChanges();
     }
@@ -151,6 +153,7 @@ export class ShoppingcartComponent implements OnInit, OnChanges {
   }
 
   goToCheckout(): void {
+    this.closeCart(); // Đóng giỏ hàng trước khi điều hướng
     this.router.navigate(['/checkout']);
   }
 }

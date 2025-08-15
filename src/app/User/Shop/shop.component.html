@@ -45,9 +45,83 @@
           <span class="material-icons icon">shopping_cart</span>
           <span class="cart-badge">{{ cartItems }}</span>
         </button>
-        <button class="icon-btn">
-          <span class="material-icons icon">person</span>
-        </button>
+        <div class="user-dropdown" [class.open]="showUserMenu">
+          <button class="icon-btn user-btn" (click)="toggleUserMenu()">
+            <span class="material-icons icon">person</span>
+          </button>
+          <ul class="dropdown-menu" [class.show]="showUserMenu">
+            <li class="profile-details">
+              <div class="profile-info">
+                <h4>{{ userName }}</h4>
+                <span class="profile-email">{{ userEmail }}</span>
+              </div>
+            </li>
+            <li>
+              <a routerLink="/profile">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z"
+                    stroke="#4a90e2"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22"
+                    stroke="#4a90e2"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Profile
+              </a>
+            </li>
+            <li>
+              <a (click)="logout()" style="cursor: pointer">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M17.4399 14.62L19.9999 12.06L17.4399 9.5"
+                    stroke="#4a90e2"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M9.76001 12.0601H19.93"
+                    stroke="#4a90e2"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M11.76 20C7.34001 20 3.76001 17 3.76001 12C3.76001 7 7.34001 4 11.76 4"
+                    stroke="#4a90e2"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Logout
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </header>
@@ -195,7 +269,11 @@
 
       <!-- Products Grid -->
       <div class="products-grid" [class.list-view]="viewMode === 'list'">
-        <div *ngFor="let product of filteredProducts" class="product-card">
+        <div
+          *ngFor="let product of filteredProducts"
+          class="product-card"
+          (click)="goToProductDetail(product.id)"
+        >
           <div class="product-image-container">
             <img
               [src]="product.image"
@@ -233,14 +311,12 @@
             </div>
 
             <button
-              (click)="addToCart(product)"
+              (click)="addToCart(product); $event.stopPropagation()"
               class="add-to-cart-btn"
-              [disabled]="product.badge === 'Out of Stock'"
+              [disabled]="product.badge === 'Hết hàng'"
             >
               {{
-                product.badge === "Out of Stock"
-                  ? "Out of Stock"
-                  : "Add to Cart"
+                product.badge === "Hết hàng" ? "Hết hàng" : "Thêm vào giỏ hàng"
               }}
             </button>
           </div>

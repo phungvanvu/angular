@@ -154,7 +154,7 @@ export class CreateVariationComponent implements OnInit {
 
     const payload = {
       name: this.variationName.trim(),
-      type: this.variationType === 'Text' ? 'dropdown' : 'color',
+      type: this.variationType === 'Text' ? 'Text' : 'Color',
       isGlobal: this.isGlobal,
       variationValues: this.values.map((value) => ({
         label: value.label.trim(),

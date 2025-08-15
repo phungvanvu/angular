@@ -1,0 +1,83 @@
+<div class="category-container">
+  <!-- Bảng trái: Cây danh mục -->
+  <div class="table-container left-table">
+    <div class="category-tree">
+      <button class="primary" (click)="addRootCategory()">Add Root Category</button>
+      <button (click)="addSubcategory()">Add Subcategory</button>
+      <div style="margin: 0.5rem 0;">
+        <button class="link" (click)="collapseAll($event)">Collapse All</button>
+        <button class="link" (click)="expandAll($event)">Expand All</button>
+      </div>
+
+      <ul class="tree">
+        <li [class.open]="category.isOpen" *ngFor="let category of categories">
+          <span class="toggle-btn" (click)="toggleCategory(category)"></span>
+          <span class="folder" (click)="selectCategory(category)">
+            {{ category.name }}
+          </span>
+          <ul *ngIf="category.children?.length">
+            <ng-container *ngTemplateOutlet="recursiveTree; context:{ $implicit: category.children }"></ng-container>
+          </ul>
+        </li>
+      </ul>
+
+      <ng-template #recursiveTree let-subcategories>
+        <li [class.open]="cat.isOpen" *ngFor="let cat of subcategories">
+          <span class="toggle-btn" (click)="toggleCategory(cat)"></span>
+          <span class="folder" (click)="selectCategory(cat)">
+            {{ cat.name }}
+          </span>
+          <ul *ngIf="cat.children?.length">
+            <ng-container *ngTemplateOutlet="recursiveTree; context:{ $implicit: cat.children }"></ng-container>
+          </ul>
+        </li>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Bảng phải: Form và tab -->
+  <div class="table-container right-table">
+    <div class="category-form">
+      <div class="tabs">
+        <div class="tab" [class.active]="activeTab === 'general'" (click)="setActiveTab('general')">General</div>
+      </div>
+
+      <form (ngSubmit)="saveCategory()" *ngIf="activeTab === 'general'" class="form-content">
+        
+        <!-- Chỉ hiển thị ID khi là category cũ -->
+        <div class="form-group" *ngIf="isExistingCategory">
+          <label for="id" class="block text-sm font-medium text-gray-700">ID</label>
+          <input type="text" id="id" [(ngModel)]="formData.id" name="id"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100"
+                 readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="name" class="block text-sm font-medium text-gray-700">Name <span class="text-red-600">*</span></label>
+          <input type="text" id="name" [(ngModel)]="formData.name" name="name" required
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                 placeholder="Enter category name">
+        </div>
+
+        <div class="form-group">
+          <div class="flex items-center">
+            <input type="checkbox" id="searchable" [(ngModel)]="formData.searchable" name="searchable"
+                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+            <label for="searchable" class="ml-2 block text-sm text-gray-700">Show this category in search box category list</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="flex items-center">
+            <input type="checkbox" id="status" [(ngModel)]="formData.status" name="status"
+                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+            <label for="status" class="ml-2 block text-sm text-gray-700">Enable the category</label>
+          </div>
+        </div>
+
+        <button type="submit" class="primary mt-4">Save</button>
+        <button *ngIf="isExistingCategory" type="button" class="danger mt-4 ml-2" (click)="deleteCategory()">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -27,7 +27,13 @@ export class CreateImageComponent implements OnInit {
   @ViewChild('action') actionTemplate!: TemplateRef<any>;
 
   @Input() entityId: number | null = null;
-  @Input() zone: 'logo' | 'banner' | null = null;
+  @Input() zone:
+    | 'logo'
+    | 'banner'
+    | 'thumbnail'
+    | 'gallery'
+    | 'variant'
+    | null = null;
 
   @Output() fileInserted = new EventEmitter<{
     fileId: number;
@@ -52,7 +58,6 @@ export class CreateImageComponent implements OnInit {
 
   @Input()
   set selectedFileIds(value: number[]) {
-    console.log('🔔 selectedFileIds updated:', value);
     this._selectedFileIds = value;
     this.cd.detectChanges();
   }
@@ -77,7 +82,7 @@ export class CreateImageComponent implements OnInit {
 
   ngOnInit() {
     this.isEntityLinkingMode = !!this.zone;
-    console.log('🔍 CreateImageComponent initialized:', {
+    console.log('CreateImageComponent initialized:', {
       entityId: this.entityId,
       zone: this.zone,
       isEntityLinkingMode: this.isEntityLinkingMode,

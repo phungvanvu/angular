@@ -1,4 +1,9 @@
 <div class="product-detail-container">
+  <shoppingcart
+    [isCartOpen]="isCartOpen"
+    [closeCart]="closeCart.bind(this)"
+  ></shoppingcart>
+
   <!-- Header -->
   <header class="header">
     <div class="header-content">
@@ -11,6 +16,7 @@
           <a href="#" class="nav-link">Deals</a>
         </nav>
       </div>
+
       <div class="header-right">
         <div class="search-box">
           <input
@@ -23,9 +29,13 @@
         <button class="icon-btn">
           <span class="material-icons icon">favorite_border</span>
         </button>
-        <button class="icon-btn cart-btn">
+        <button
+          class="icon-btn cart-btn"
+          data-cy="open-cart"
+          (click)="isCartOpen = !isCartOpen"
+        >
           <span class="material-icons icon">shopping_cart</span>
-          <!-- <span class="cart-badge">{{ cartItems }}</span> -->
+          <span class="cart-badge">{{ cartItems }}</span>
         </button>
         <button class="icon-btn">
           <span class="material-icons icon">person</span>

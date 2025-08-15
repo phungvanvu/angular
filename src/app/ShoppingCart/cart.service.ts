@@ -38,7 +38,6 @@ export class CartService {
         this.loadingSubject.next(false);
       }
     } else {
-      // During SSR, initialize empty state
       this.cartSubject.next([]);
       this.subtotalSubject.next(0);
       this.loadingSubject.next(false);
@@ -88,9 +87,9 @@ export class CartService {
           product: {
             id: item.productId,
             name: item.productName,
-            variantName: item.variantName || '', // từ API
+            variantName: item.variantName || '',
             variantId: item.productVariantId,
-            price: item.unitPrice || 0, // từ API
+            price: item.unitPrice || 0,
             image: item.productThumbnail
               ? `http://localhost:8080/elec/${item.productThumbnail.replace(
                   /\\/g,
@@ -102,9 +101,7 @@ export class CartService {
           quantity: item.qty || 1,
         }));
 
-        // Nếu muốn lấy subtotal từ API luôn
         const subtotal = res?.result?.total ?? 0;
-
         this.cartSubject.next(cart);
         this.subtotalSubject.next(subtotal);
         this.loadingSubject.next(false);
@@ -124,7 +121,7 @@ export class CartService {
 
   async addToCart(product: Product): Promise<void> {
     if (!this.isBrowser) {
-      throw new Error('Cart operations not supported on server');
+      throw new Error('Thao tác giỏ hàng không được hỗ trợ trên server');
     }
 
     const token = localStorage.getItem('accessToken');
@@ -149,24 +146,47 @@ export class CartService {
       : product.name;
     const cartProduct = { ...product, name: cartProductName };
 
+    // Tạo cartItemVariations động
+    let cartItemVariations: any[] = [];
+    if (product.variants && product.variants.length > 0 && product.variantId) {
+      const selectedVariant = product.variants.find(
+        (v: any) => v.id === product.variantId
+      );
+      if (
+        selectedVariant &&
+        product.variations &&
+        product.variations.length > 0
+      ) {
+        const variation = product.variations.find((v: any) =>
+          v.variationValues.some((vv: any) => vv.label === selectedVariant.name)
+        );
+        if (variation) {
+          const variationValue = variation.variationValues.find(
+            (vv: any) => vv.label === selectedVariant.name
+          );
+          if (variationValue) {
+            cartItemVariations = [
+              {
+                variationId: variation.id,
+                type: variation.type, // Hoặc variation.type nếu API yêu cầu
+                value: variationValue.value,
+                cartItemVariationValues: [
+                  { variationValueId: variationValue.id },
+                ],
+              },
+            ];
+          }
+        }
+      }
+    }
+
     const cartItem = {
       cartItems: [
         {
           productId: product.id,
-          productVariantId: product.variantId,
-          qty: product.quantity,
-          cartItemVariations: product.variantName
-            ? [
-                {
-                  variationId: 1,
-                  type: 'Value',
-                  value: product.variantName,
-                  cartItemVariationValues: [
-                    { variationValueId: product.variantId },
-                  ],
-                },
-              ]
-            : [],
+          productVariantId: product.variantId || null,
+          qty: product.quantity || 1,
+          cartItemVariations,
         },
       ],
     };
@@ -181,15 +201,21 @@ export class CartService {
               item.product.variantId === product.variantId
           );
           if (existingItem) {
-            existingItem.quantity++;
+            existingItem.quantity += product.quantity || 1;
           } else {
-            currentCart.push({ product: cartProduct, quantity: 1 });
+            currentCart.push({
+              product: cartProduct,
+              quantity: product.quantity || 1,
+            });
           }
           this.cartSubject.next([...currentCart]);
           this.updateSubtotal();
           resolve();
         },
-        error: (err) => reject(err),
+        error: (err) => {
+          console.error('Lỗi API giỏ hàng:', err);
+          reject(err);
+        },
       });
     });
   }
@@ -199,7 +225,7 @@ export class CartService {
     quantity: number;
   }): Promise<void> {
     if (!this.isBrowser) {
-      throw new Error('Cart operations not supported on server');
+      throw new Error('Thao tác giỏ hàng không được hỗ trợ trên server');
     }
 
     const token = localStorage.getItem('accessToken');
@@ -243,7 +269,7 @@ export class CartService {
     quantity: number;
   }): Promise<void> {
     if (!this.isBrowser) {
-      throw new Error('Cart operations not supported on server');
+      throw new Error('Thao tác giỏ hàng không được hỗ trợ trên server');
     }
 
     const token = localStorage.getItem('accessToken');
@@ -291,7 +317,7 @@ export class CartService {
     quantity: number;
   }): Promise<void> {
     if (!this.isBrowser) {
-      throw new Error('Cart operations not supported on server');
+      throw new Error('Thao tác giỏ hàng không được hỗ trợ trên server');
     }
 
     const token = localStorage.getItem('accessToken');
@@ -332,7 +358,7 @@ export class CartService {
 
   async clearCart(): Promise<void> {
     if (!this.isBrowser) {
-      throw new Error('Cart operations not supported on server');
+      throw new Error('Thao tác giỏ hàng không được hỗ trợ trên server');
     }
 
     const token = localStorage.getItem('accessToken');

@@ -1,0 +1,224 @@
+.tree,
+.tree ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.tree ul {
+  margin-left: 0.25rem;
+  display: none; /* Hidden by default, shown via .open class */
+}
+
+.tree li {
+  position: relative;
+  padding-left: 1.25rem;
+  line-height: 1.5rem;
+}
+
+/* Horizontal line from parent node */
+.tree li::before {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  left: 0;
+  width: 0.75rem;
+  height: 1px;
+  background: #d1d5db; /* gray-300 */
+  z-index: 1;
+}
+
+/* Vertical connecting line */
+.tree li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: #d1d5db;
+  z-index: 0;
+}
+
+/* Cut vertical line short for last child */
+.tree li:last-child::after {
+  height: 0.75rem;
+}
+
+/* First-level node adjustment */
+.tree > li::before {
+  width: 0.5rem;
+}
+
+.tree > li::after {
+  height: 100%;
+  top: 0;
+}
+
+/* Show children when parent has class 'open' */
+.tree li.open > ul {
+  display: block;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  position: absolute;
+  left: -0.5rem;
+  top: 0.625rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #6b7280; /* gray-500 */
+  border: 1.5px solid #d1d5db; /* gray-300 */
+  background-color: white;
+  border-radius: 0.125rem;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  box-sizing: content-box;
+}
+
+.toggle-btn:hover {
+  color: #374151; /* gray-700 */
+  border-color: #374151;
+}
+
+/* Default: plus sign */
+.toggle-btn::before {
+  content: "+";
+  line-height: 1;
+}
+
+/* When open: minus sign */
+li.open > .toggle-btn::before {
+  content: "−";
+}
+
+/* Folder node */
+.folder {
+  cursor: pointer;
+  color: #333;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+/* Optional folder icon */
+.folder::before {
+  content: '\1F4C1'; /* 📁 */
+  margin-right: 6px;
+  color: goldenrod;
+}
+
+/* --- Layout and Table Styles --- */
+.category-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Bảng trái chiếm 1 phần, bảng phải chiếm 2 phần */
+  gap: 1rem;
+  height: calc(100vh - 2rem); /* Điều chỉnh chiều cao trừ padding */
+  overflow: hidden;
+  margin : 30px;
+}
+
+.table-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.left-table {
+  min-width: 0; /* Ngăn tràn nội dung */
+}
+
+.right-table {
+  min-width: 0;
+}
+
+/* --- Form and Tab Styles --- */
+.category-form {
+  width: 100%;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.tab.active {
+  color: #1d4ed8;
+  border-bottom: 2px solid #1d4ed8;
+}
+
+.form-content {
+  padding: 1rem 0;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.form-group .checkbox-label {
+  display: flex;
+  align-items: center;
+}
+
+.form-group input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.primary {
+  background-color: #1d4ed8;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.primary:hover {
+  background-color: #2563eb;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #1d4ed8;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 1rem;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+.category-tree{
+    padding:20px;
+    border-radius: 3px ;
+}
